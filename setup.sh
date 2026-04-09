@@ -25,7 +25,7 @@ else
 fi
 
 # Install Node deps
-npm install
+npm ci
 
 echo ""
 echo "Setup complete."

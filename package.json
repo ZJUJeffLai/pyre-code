@@ -9,7 +9,7 @@
     "url": "https://github.com/kiren/pyre"
   },
   "scripts": {
-    "postinstall": "cd web && npm install",
+    "postinstall": "cd web && npm ci",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "uvicorn grading_service.main:app --reload --reload-exclude '.git' --reload-exclude '.venv' --port 8000",
     "dev:frontend": "cd web && npm run dev"
