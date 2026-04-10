@@ -5,7 +5,7 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Menu, ChevronLeft, ChevronRight } from 'lucide-react';
-import { SplitPane } from '@/components/ui/SplitPane';
+import { SplitPane, VerticalSplitPane } from '@/components/ui/SplitPane';
 import { TopNav } from '@/components/layout/TopNav';
 import { ProblemDrawer } from '@/components/layout/ProblemDrawer';
 import { DescriptionTab } from '@/components/workspace/DescriptionTab';
@@ -196,11 +196,18 @@ export default function WorkspacePage() {
 
   const rightPanel = (
     <div className="h-full flex flex-col">
-      <div className="flex-[3] min-h-0 overflow-hidden">
-        <CodeEditor value={currentCode} onChange={setCurrentCode} />
-      </div>
-      <TestPanel tests={problem.tests} functionName={problem.functionName} />
-      <ActionBar onSubmit={handleSubmit} onRun={handleRun} isSubmitting={isSubmitting} isRunning={isRunning} />
+      <VerticalSplitPane
+        top={<CodeEditor value={currentCode} onChange={setCurrentCode} />}
+        bottom={
+          <div className="flex flex-col h-full">
+            <TestPanel tests={problem.tests} functionName={problem.functionName} />
+            <ActionBar onSubmit={handleSubmit} onRun={handleRun} isSubmitting={isSubmitting} isRunning={isRunning} />
+          </div>
+        }
+        defaultRatio={0.65}
+        minTop={200}
+        minBottom={150}
+      />
     </div>
   );
 
