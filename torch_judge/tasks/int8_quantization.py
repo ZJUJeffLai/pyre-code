@@ -22,8 +22,8 @@ TASK = {
             "code": "\nimport torch\ntorch.manual_seed(0)\nw = torch.randn(16, 8)\nq = {fn}(w)\nw_recon = q.weight_int8.float() * q.scale\nassert (w - w_recon).abs().max() < 0.1, 'Quantization error too large'\n"
         },
         {
-            "name": "Forward output shape",
-            "code": "\nimport torch\nq = {fn}(torch.randn(8, 4), torch.randn(8))\nout = q(torch.randn(2, 4))\nassert out.shape == (2, 8), f'Shape: {out.shape}'\n"
+            "name": "Forward with bias correctness",
+            "code": "\nimport torch\ntorch.manual_seed(0)\nw = torch.randn(8, 4)\nb = torch.randn(8)\nq_bias = {fn}(w, b)\nq_no_bias = {fn}(w)\nx = torch.randn(2, 4)\nout_bias = q_bias(x)\nout_no = q_no_bias(x)\nassert out_bias.shape == (2, 8), f'Shape: {out_bias.shape}'\nassert torch.allclose(out_bias - out_no, b.unsqueeze(0).expand(2, -1), atol=1e-5), 'Bias not correctly added'\n"
         },
         {
             "name": "Weight is buffer not parameter",

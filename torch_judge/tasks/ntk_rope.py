@@ -66,6 +66,29 @@ q4, _ = {fn}(q, k, scale=4.0)
 assert not torch.allclose(q1, q4, atol=1e-3), 'Different scales should produce different rotations'
 """,
         },
+        {
+            "name": "NTK base formula correctness",
+            "code": """
+import torch
+torch.manual_seed(0)
+B, S, D = 1, 4, 8
+scale = 4.0
+q = torch.randn(B, S, D)
+k = torch.randn(B, S, D)
+q_rot, k_rot = {fn}(q, k, scale)
+# Reference with exact NTK base
+new_base = 10000.0 * (scale ** (D / (D - 2)))
+pos = torch.arange(S).float().unsqueeze(1)
+dim = torch.arange(0, D, 2).float()
+freqs = 1.0 / (new_base ** (dim / D))
+angles = pos * freqs
+cos_a, sin_a = torch.cos(angles), torch.sin(angles)
+def rotate(x):
+    x1, x2 = x[..., 0::2], x[..., 1::2]
+    return torch.stack([x1*cos_a - x2*sin_a, x1*sin_a + x2*cos_a], dim=-1).flatten(-2)
+assert torch.allclose(q_rot, rotate(q), atol=1e-5), 'NTK base formula mismatch'
+""",
+        },
     ],
     "solution": '''def ntk_rope(q, k, scale):
     B, S, D = q.shape

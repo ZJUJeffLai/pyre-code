@@ -33,7 +33,8 @@
 - **秒级反馈** — 提交即判，逐条显示测试结果
 - **参考实现** — 先自己写，再看答案
 - **进度记录** — 做了多少、试了几次，关掉浏览器也不丢
-- **数据不出本机** — 全部本地运行，没有任何远程调用
+- **AI 辅助** — 可选的 AI 提示功能，支持任意 OpenAI 兼容 API（在 `.env` 或 UI 中配置）
+- **数据不出本机** — 全部本地运行，没有任何远程调用（除非你启用了 AI 辅助）
 
 ### 技术栈
 
@@ -105,6 +106,18 @@ docker compose up --build
 ```
 
 打开 `http://localhost:3000` 即可。进度存在 Docker 卷里，`docker compose down -v` 可以重置。
+
+### AI 辅助（可选）
+
+如需启用服务端 AI 提示，将 `web/.env.example` 复制为 `web/.env` 并填入：
+
+```bash
+AI_HELP_BASE_URL=https://api.openai.com/v1
+AI_HELP_API_KEY=sk-...
+AI_HELP_MODEL=gpt-4o-mini
+```
+
+支持任意 OpenAI 兼容接口（OpenAI、Anthropic 代理、Ollama 等）。如果未配置服务端，用户也可以在 UI 中自行填写 API key。
 
 ---
 

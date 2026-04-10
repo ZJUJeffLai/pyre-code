@@ -19,7 +19,7 @@ TASK = {
         },
         {
             "name": "Relative position property",
-            "code": "\nimport torch\ntorch.manual_seed(0)\nq = torch.randn(1, 8, 16)\nk = torch.randn(1, 8, 16)\nq_rot, k_rot = {fn}(q, k)\nq2 = torch.cat([torch.zeros(1, 3, 16), q], dim=1)\nk2 = torch.cat([torch.zeros(1, 3, 16), k], dim=1)\nq2_rot, k2_rot = {fn}(q2, k2)\ndot1 = (q_rot[:, 0] * k_rot[:, 0]).sum(dim=-1)\ndot2 = (q2_rot[:, 3] * k2_rot[:, 3]).sum(dim=-1)\nassert torch.allclose(dot1, dot2, atol=1e-4), 'Dot product should depend on relative position only'\n"
+            "code": "\nimport torch\ntorch.manual_seed(0)\nq = torch.randn(1, 8, 16)\nk = torch.randn(1, 8, 16)\nq_rot, k_rot = {fn}(q, k)\nq2 = torch.cat([torch.zeros(1, 3, 16), q], dim=1)\nk2 = torch.cat([torch.zeros(1, 3, 16), k], dim=1)\nq2_rot, k2_rot = {fn}(q2, k2)\n# Same relative distance of 2: pos 0 vs pos 2, and pos 3 vs pos 5\ndot1 = (q_rot[:, 0] * k_rot[:, 2]).sum(dim=-1)\ndot2 = (q2_rot[:, 3] * k2_rot[:, 5]).sum(dim=-1)\nassert torch.allclose(dot1, dot2, atol=1e-4), 'Dot product should depend on relative position only'\n"
         },
         {
             "name": "Gradient flow",

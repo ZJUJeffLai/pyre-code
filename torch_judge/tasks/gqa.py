@@ -10,6 +10,10 @@ TASK = {
     "hint_zh": "1. `W_q` → `(B,H,S,d_k)`，`W_k`/`W_v` → `(B,KV,S,d_k)`\n2. `K = K.repeat_interleave(H//KV, dim=1)` 扩展 KV 头\n3. 缩放点积注意力 → reshape 为 `(B,S,d_model)`",
     "tests": [
         {
+            "name": "Is nn.Module",
+            "code": "\nimport torch, torch.nn as nn\ngqa = {fn}(d_model=16, num_heads=4, num_kv_heads=2)\nassert isinstance(gqa, nn.Module), 'GroupQueryAttention should inherit from nn.Module'\n",
+        },
+        {
             "name": "Output shape",
             "code": """
 import torch
@@ -70,8 +74,9 @@ assert gqa.W_q.weight.grad is not None and gqa.W_k.weight.grad is not None, 'Mis
 """,
         },
     ],
-    "solution": '''class GroupQueryAttention:
+    "solution": '''class GroupQueryAttention(nn.Module):
     def __init__(self, d_model, num_heads, num_kv_heads):
+        super().__init__()
         self.num_heads = num_heads
         self.num_kv_heads = num_kv_heads
         self.d_k = d_model // num_heads

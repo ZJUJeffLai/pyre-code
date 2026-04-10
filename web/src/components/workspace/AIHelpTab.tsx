@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Collapsible from '@radix-ui/react-collapsible';
-import { ChevronDown, Loader2, Settings2, Sparkles } from 'lucide-react';
+import { ChevronDown, Loader2, Settings2, Sparkles, ServerCog } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useLocale } from '@/context/LocaleContext';
 import { MarkdownContent } from '@/components/workspace/MarkdownContent';
@@ -20,6 +20,7 @@ interface AIHelpTabProps {
 export function AIHelpTab({ problem }: AIHelpTabProps) {
   const { locale, t } = useLocale();
   const hasLoadedConfig = useRef(false);
+  const [serverConfigured, setServerConfigured] = useState(false);
   const {
     currentCode,
     aiHelpConfig,
@@ -68,8 +69,15 @@ export function AIHelpTab({ problem }: AIHelpTabProps) {
     localStorage.setItem(CUSTOM_PROMPT_STORAGE_KEY, aiHelpCustomPrompt);
   }, [aiHelpCustomPrompt]);
 
+  useEffect(() => {
+    fetch('/api/ai-help/status')
+      .then((r) => r.json())
+      .then((d: { configured: boolean }) => setServerConfigured(d.configured))
+      .catch(() => setServerConfigured(false));
+  }, []);
+
   const handleGenerate = async () => {
-    if (!aiHelpConfig.baseUrl.trim() || !aiHelpConfig.apiKey.trim() || !aiHelpConfig.model.trim()) {
+    if (!serverConfigured && (!aiHelpConfig.baseUrl.trim() || !aiHelpConfig.apiKey.trim() || !aiHelpConfig.model.trim())) {
       setAiHelpConfigOpen(true);
       setAiHelpError(t('aiHelpMissingConfig'));
       setAiHelpResponse(null);
@@ -177,7 +185,14 @@ export function AIHelpTab({ problem }: AIHelpTabProps) {
           </Collapsible.Trigger>
 
           <Collapsible.Content className="space-y-3 pt-3">
-            <div className="text-xs font-medium text-text-secondary">{t('aiHelpSetup')}</div>
+            {serverConfigured ? (
+              <div className="flex items-center gap-2 rounded-lg border border-easy/30 bg-easy/5 px-3 py-2 text-sm text-easy">
+                <ServerCog className="h-4 w-4" />
+                {t('aiHelpServerConfigured')}
+              </div>
+            ) : (
+              <>
+                <div className="text-xs font-medium text-text-secondary">{t('aiHelpSetup')}</div>
 
             <label className="block space-y-1">
               <span className="text-xs font-medium text-text-secondary">{t('aiHelpBaseUrl')}</span>
@@ -211,6 +226,8 @@ export function AIHelpTab({ problem }: AIHelpTabProps) {
                 placeholder="gpt-4o-mini"
               />
             </label>
+              </>
+            )}
           </Collapsible.Content>
         </Collapsible.Root>
       </div>

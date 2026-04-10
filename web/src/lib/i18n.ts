@@ -87,6 +87,7 @@ const en = {
   aiHelpMissingConfig: 'Base URL, API key, and model are required.',
   aiHelpRequestFailed: 'AI request failed.',
   aiHelpSafetyNote: 'The assistant is instructed to give hints and debugging guidance, not a full answer.',
+  aiHelpServerConfigured: 'Using server-configured AI endpoint.',
 } as const;
 
 type Translations = Record<keyof typeof en, string>;
@@ -170,6 +171,7 @@ const zh: Translations = {
   aiHelpMissingConfig: '必须填写 Base URL、API Key 和模型名。',
   aiHelpRequestFailed: 'AI 请求失败。',
   aiHelpSafetyNote: '助手被要求优先给提示和排查思路，而不是直接给完整答案。',
+  aiHelpServerConfigured: '已使用服务端配置的 AI 接口。',
 };
 
 export const dictionaries = { en, zh };

@@ -35,7 +35,8 @@ The problems cover what's actually inside Transformers, vLLM, TRL, and diffusion
 - **Instant feedback** — submit and see pass/fail per test case in seconds
 - **Reference solutions** — compare after your own attempt
 - **Progress tracking** — solved count and attempt history, persisted across sessions
-- **Fully local** — nothing leaves your machine
+- **AI Help** — optional AI-powered hints via any OpenAI-compatible API (configure in `.env` or per-user in the UI)
+- **Fully local** — nothing leaves your machine (unless you opt into AI Help)
 
 ### Tech Stack
 
@@ -107,6 +108,18 @@ docker compose up --build
 ```
 
 Open `http://localhost:3000`. Progress is persisted in a Docker volume. Run `docker compose down -v` to reset.
+
+### AI Help (optional)
+
+To enable server-side AI hints, copy `web/.env.example` to `web/.env` and fill in:
+
+```bash
+AI_HELP_BASE_URL=https://api.openai.com/v1
+AI_HELP_API_KEY=sk-...
+AI_HELP_MODEL=gpt-4o-mini
+```
+
+Any OpenAI-compatible endpoint works (OpenAI, Anthropic via proxy, Ollama, etc.). Users can also configure their own API key in the UI if no server-side config is set.
 
 ---
 

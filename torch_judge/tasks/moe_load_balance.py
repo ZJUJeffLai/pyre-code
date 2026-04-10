@@ -23,17 +23,7 @@ assert loss.item() > 0, 'Loss should be positive'
         },
         {
             "name": "Uniform routing gives loss = 1.0",
-            "code": """
-import torch
-# Uniform logits -> uniform softmax -> uniform argmax -> f_i = 1/N, P_i = 1/N
-# L_aux = N * N * (1/N)^2 = 1.0
-num_experts = 4
-N_tokens = 100
-# Identical logits -> uniform distribution
-logits = torch.zeros(N_tokens, num_experts)
-loss = {fn}(logits, num_experts)
-assert abs(loss.item() - 1.0) < 1e-4, f'Uniform routing should give loss=1.0, got {loss.item():.4f}'
-"""
+            "code": "\nimport torch\n# Explicitly construct uniform routing: each expert gets N/E tokens\nnum_experts = 4\nN_tokens = 100\nlogits = torch.zeros(N_tokens, num_experts)\nfor e in range(num_experts):\n    logits[e * 25:(e + 1) * 25, e] = 10.0\n# f_i = 1/4 for all i, P_i ≈ softmax-dominated by the assigned expert\n# With large logit gap, P_i ≈ 1/4 on average, so L_aux ≈ 4 * 4 * (1/4)^2 = 1.0\nloss = {fn}(logits, num_experts)\nassert abs(loss.item() - 1.0) < 0.05, f'Uniform routing should give loss≈1.0, got {loss.item():.4f}'\n"
         },
         {
             "name": "Collapsed routing gives loss > 1",

@@ -1,6 +1,29 @@
 import { NextResponse } from 'next/server';
 import type { AiHelpRequest } from '@/lib/types';
 
+/* ── env defaults ── */
+const ENV_BASE_URL = process.env.AI_HELP_BASE_URL?.trim() || '';
+const ENV_API_KEY = process.env.AI_HELP_API_KEY?.trim() || '';
+const ENV_MODEL = process.env.AI_HELP_MODEL?.trim() || '';
+
+/* ── simple in-memory rate limiter ── */
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 10;
+const hits = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = (hits.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
+  if (timestamps.length >= RATE_MAX) {
+    hits.set(ip, timestamps);
+    return true;
+  }
+  timestamps.push(now);
+  hits.set(ip, timestamps);
+  return false;
+}
+
+/* ── helpers ── */
 function normalizeBaseUrl(baseUrl: string): string {
   return baseUrl.trim().replace(/\/+$/, '');
 }
@@ -105,15 +128,27 @@ function buildPrompt(request: AiHelpRequest) {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as AiHelpRequest;
-  const { config } = body;
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please wait a moment before trying again.' },
+      { status: 429 },
+    );
+  }
 
-  if (!config?.baseUrl?.trim() || !config?.apiKey?.trim() || !config?.model?.trim()) {
+  const body = (await request.json()) as AiHelpRequest;
+
+  // Server env takes priority; fall back to client config
+  const baseUrl = ENV_BASE_URL || body.config?.baseUrl?.trim() || '';
+  const apiKey = ENV_API_KEY || body.config?.apiKey?.trim() || '';
+  const model = ENV_MODEL || body.config?.model?.trim() || '';
+
+  if (!baseUrl || !apiKey || !model) {
     return NextResponse.json({ error: 'Missing baseUrl, apiKey, or model.' }, { status: 400 });
   }
 
   const payload = {
-    model: config.model,
+    model,
     stream: false,
     temperature: 0.4,
     messages: [
@@ -135,17 +170,23 @@ export async function POST(request: Request) {
   };
 
   try {
-    const upstream = await fetch(`${normalizeBaseUrl(config.baseUrl)}/chat/completions`, {
+    const upstream = await fetch(`${normalizeBaseUrl(baseUrl)}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
     });
 
     const data = await upstream.json().catch(() => null);
     if (!upstream.ok) {
+      if (upstream.status === 401) {
+        return NextResponse.json({ error: 'Invalid API key. Please check your configuration.' }, { status: 401 });
+      }
+      if (upstream.status === 429) {
+        return NextResponse.json({ error: 'API rate limit exceeded. Please try again later.' }, { status: 429 });
+      }
       const errorMessage =
         data && typeof data === 'object' && 'error' in data && data.error && typeof data.error === 'object' && 'message' in data.error
           ? String(data.error.message)
@@ -158,7 +199,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Model returned an empty response.' }, { status: 502 });
     }
 
-    return NextResponse.json({ guidance, model: data?.model || config.model });
+    return NextResponse.json({ guidance, model: data?.model || model });
   } catch {
     return NextResponse.json({ error: 'Failed to reach the configured AI endpoint.' }, { status: 502 });
   }

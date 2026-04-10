@@ -106,7 +106,7 @@ assert n_grad == n_total, f'Only {n_grad}/{n_total} params got gradients'
         new_cache = (k, v)
         S_total = k.shape[2]
 
-        scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
+        scores = torch.matmul(q, k.transpose(-2, -1)) / (self.d_k ** 0.5)
 
         if S_new > 1:
             # Causal mask for prefill: each query position can only attend to

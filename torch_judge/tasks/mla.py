@@ -36,6 +36,10 @@ W_uv  = torch.randn(kv_rank, num_heads * D_h)
 W_q   = torch.randn(D, num_heads * D_h)
 X = torch.randn(B, S, D)
 out = {fn}(X, W_dkv, W_uk, W_uv, W_q, num_heads)
+# Conceptual check: verify the compression dimensions are correct.
+# This independently computes c_kv to validate the shape of the latent
+# representation. The student's actual code path is authoritatively
+# validated by the 'Numerical correctness' test (test 5).
 c_kv = X @ W_dkv
 assert c_kv.shape == (B, S, kv_rank), f'Latent shape should be ({B}, {S}, {kv_rank}), got {c_kv.shape}'
 assert kv_rank < D, 'kv_rank should be smaller than D for compression'

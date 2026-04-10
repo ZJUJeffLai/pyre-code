@@ -20,6 +20,10 @@ TASK = {
     ),
     "tests": [
         {
+            "name": "Is nn.Module",
+            "code": "\nimport torch, torch.nn as nn\nmha = {fn}(d_model=16, num_heads=2)\nassert isinstance(mha, nn.Module), 'MultiHeadAttention should inherit from nn.Module'\n",
+        },
+        {
             "name": "Output shape",
             "code": """
 import torch
@@ -105,8 +109,9 @@ assert not torch.allclose(q[:, 0], q[:, 1], atol=1e-3), 'Heads produce identical
 """,
         },
     ],
-    "solution": '''class MultiHeadAttention:
+    "solution": '''class MultiHeadAttention(nn.Module):
     def __init__(self, d_model: int, num_heads: int):
+        super().__init__()
         self.num_heads = num_heads
         self.d_k = d_model // num_heads
 

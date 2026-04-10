@@ -72,7 +72,7 @@ assert n_grad == n_total, f'Only {n_grad}/{n_total} params got gradients'
     ],
     "solution": '''class _GELU(nn.Module):
     def forward(self, x):
-        return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+        return x * 0.5 * (1.0 + torch.erf(x / (2.0 ** 0.5)))
 
 class GPT2Block(nn.Module):
     def __init__(self, d_model, num_heads):
@@ -99,7 +99,7 @@ class GPT2Block(nn.Module):
         q = self.W_q(x).view(B, S, self.num_heads, self.d_k).transpose(1, 2)
         k = self.W_k(x).view(B, S, self.num_heads, self.d_k).transpose(1, 2)
         v = self.W_v(x).view(B, S, self.num_heads, self.d_k).transpose(1, 2)
-        scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
+        scores = torch.matmul(q, k.transpose(-2, -1)) / (self.d_k ** 0.5)
         mask = torch.triu(torch.ones(S, S, device=x.device, dtype=torch.bool), diagonal=1)
         scores = scores.masked_fill(mask, float('-inf'))
         weights = torch.softmax(scores, dim=-1)

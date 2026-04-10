@@ -48,6 +48,22 @@ assert torch.allclose(out, ref, atol=1e-5), 'Value mismatch on 3-D'
 """,
         },
         {
+            "name": "Differs from LayerNorm (no mean subtraction)",
+            "code": """
+import torch
+torch.manual_seed(0)
+x = torch.ones(2, 8) * 5.0 + torch.randn(2, 8) * 0.1
+weight = torch.ones(8)
+out = {fn}(x, weight)
+rms = torch.sqrt(x.pow(2).mean(dim=-1, keepdim=True) + 1e-6)
+ref = x / rms * weight
+assert torch.allclose(out, ref, atol=1e-5), 'Should match RMS formula (no mean subtraction)'
+# LayerNorm would subtract mean first, giving very different results
+ln_out = torch.nn.functional.layer_norm(x, [8], weight, torch.zeros(8))
+assert not torch.allclose(out, ln_out, atol=0.1), 'Output should differ from LayerNorm'
+""",
+        },
+        {
             "name": "Gradient flow",
             "code": """
 import torch
