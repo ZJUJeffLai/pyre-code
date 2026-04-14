@@ -9,9 +9,16 @@ interface CodeEditorProps {
   onChange: (value: string) => void;
   readOnly?: boolean;
   height?: string;
+  allowParentScrollOnWheel?: boolean;
 }
 
-export function CodeEditor({ value, onChange, readOnly = false, height = '100%' }: CodeEditorProps) {
+export function CodeEditor({
+  value,
+  onChange,
+  readOnly = false,
+  height = '100%',
+  allowParentScrollOnWheel = false,
+}: CodeEditorProps) {
   const editorRef = useRef<any>(null);
 
   const handleMount: OnMount = (editor, monaco) => {
@@ -43,6 +50,7 @@ export function CodeEditor({ value, onChange, readOnly = false, height = '100%' 
         overviewRulerBorder: false,
         hideCursorInOverviewRuler: true,
         scrollbar: {
+          alwaysConsumeMouseWheel: !allowParentScrollOnWheel,
           verticalScrollbarSize: 6,
           horizontalScrollbarSize: 6,
         },

@@ -44,6 +44,7 @@ export function SolutionTab({ problemId }: SolutionTabProps) {
               onChange={() => {}}
               readOnly
               height={`${Math.max(120, solutionCode.split('\n').length * 22 + 32)}px`}
+              allowParentScrollOnWheel
             />
           </div>
         </div>
@@ -60,6 +61,7 @@ export function SolutionTab({ problemId }: SolutionTabProps) {
               onChange={() => {}}
               readOnly
               height={`${Math.max(80, demoCode.split('\n').length * 22 + 32)}px`}
+              allowParentScrollOnWheel
             />
           </div>
         </div>

@@ -67,6 +67,8 @@ npm run dev
 
 `setup.sh` 会自动创建 `.venv` 虚拟环境（优先用 `uv`，没有就回退到 `python3 -m venv`），装好所有依赖。
 
+如果仓库里存在 `.venv`，`npm run dev` 会优先使用项目内 Python；如果没有，再回退到当前 shell 里的 `python`。
+
 **方式 B — conda**
 
 ```bash
@@ -77,6 +79,8 @@ pip install -e ".[dev]"
 npm install
 npm run dev   # 记得先激活 conda 环境
 ```
+
+现在这套启动命令在 Windows CMD 和 PowerShell 下也可以直接使用，不再依赖 POSIX shell 语法。
 
 **方式 C — 手动（venv）**
 

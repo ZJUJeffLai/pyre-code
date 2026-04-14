@@ -69,6 +69,8 @@ npm run dev
 
 `setup.sh` automatically creates a `.venv` Python environment (prefers `uv`, falls back to `python3 -m venv`), installs all dependencies, then prints the start command.
 
+When `.venv` exists, `npm run dev` prefers that project-local Python automatically. If `.venv` is missing, it falls back to the current shell's `python`.
+
 **Option B — conda**
 
 ```bash
@@ -79,6 +81,8 @@ pip install -e ".[dev]"
 npm install
 npm run dev   # run with conda env activated
 ```
+
+This now works from Windows CMD and PowerShell too; the dev scripts no longer rely on POSIX shell syntax.
 
 **Option C — manual (venv)**
 
@@ -232,4 +236,3 @@ Problem set and judge engine based on [TorchCode](https://github.com/duoan/Torch
 ## 📄 License
 
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
-
