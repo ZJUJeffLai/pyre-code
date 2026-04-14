@@ -49,6 +49,16 @@ The problems cover what's actually inside Transformers, vLLM, TRL, and diffusion
 
 ---
 
+## 📢 News
+
+- **[2026/04/13]** Submission history — review all your past attempts per problem.
+- **[2026/04/10]** AI Help — optional AI-powered hints via any OpenAI-compatible API. 🔥
+- **[2026/04/10]** Print output capture — `print()` statements now show in test results.
+- **[2026/04/09]** 68 problems covering Transformers, vLLM, TRL, diffusion models, and more. 🔥
+- **[2026/04/09]** Initial release of Pyre Code 🎉
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -81,8 +91,6 @@ pip install -e ".[dev]"
 npm install
 npm run dev   # run with conda env activated
 ```
-
-This now works from Windows CMD and PowerShell too; the dev scripts no longer rely on POSIX shell syntax.
 
 **Option C — manual (venv)**
 
