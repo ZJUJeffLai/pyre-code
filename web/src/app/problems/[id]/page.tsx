@@ -7,6 +7,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import { Menu, ChevronLeft, ChevronRight, Sun, Moon, SwatchBook } from 'lucide-react';
 import { SplitPane, VerticalSplitPane } from '@/components/ui/SplitPane';
 import { ProblemDrawer } from '@/components/layout/ProblemDrawer';
+import { FeedbackModal } from '@/components/workspace/FeedbackModal';
 import { DescriptionTab } from '@/components/workspace/DescriptionTab';
 import { SolutionTab } from '@/components/workspace/SolutionTab';
 import { AIHelpTab } from '@/components/workspace/AIHelpTab';
@@ -61,6 +62,7 @@ function WorkspacePageNew() {
   const [allProblems, setAllProblems] = useState<Problem[]>([]);
   const [progress, setProgress] = useState<ProgressMap>({});
   const [pathData, setPathData] = useState<(Omit<LearningPath, 'problems'> & { problems: LearningPathProblemSummary[] }) | null>(null);
+  const [feedbackResult, setFeedbackResult] = useState<SubmissionResult | null>(null);
 
   useEffect(() => {
     fetch(`/api/problems/${id}`)
@@ -126,6 +128,7 @@ function WorkspacePageNew() {
       setSubmissionResult(data);
       setRunResult(data);
       setBottomTab('testresults');
+      setFeedbackResult(data);
       fetch('/api/progress').then((r) => r.json()).then((d) => setProgress(d.progress || {}));
       fetch(`/api/submissions/${id}`).then((r) => r.json()).then((d: SubmissionHistory[]) => setSubmissionHistory(d)).catch(() => {});
     } catch {
@@ -163,8 +166,9 @@ function WorkspacePageNew() {
               <Tabs.Trigger
                 key={tab}
                 value={tab}
-                className="px-3 h-[26px] rounded-[6px] text-[13px] text-text-2 cursor-pointer inline-flex items-center gap-1.5 transition-[background,color] duration-150 data-[state=active]:bg-[color-mix(in_oklab,var(--text)_7%,transparent)] data-[state=active]:text-text"
+                className="group px-3 h-[26px] rounded-[6px] text-[13px] text-text-2 cursor-pointer inline-flex items-center gap-1.5 transition-[background,color] duration-150 data-[state=active]:bg-[color-mix(in_oklab,var(--text)_7%,transparent)] data-[state=active]:text-text"
               >
+                <span className="w-[5px] h-[5px] rounded-full bg-accent hidden group-data-[state=active]:inline-block" />
                 {t(tab === 'description' ? 'description' : tab === 'solution' ? 'solution' : 'aiHelp')}
               </Tabs.Trigger>
             ))}
@@ -186,11 +190,32 @@ function WorkspacePageNew() {
   const rightPanel = (
     <div className="h-full flex flex-col">
       <VerticalSplitPane
-        top={<CodeEditor value={currentCode} onChange={setCurrentCode} />}
+        top={
+          <div className="flex flex-col h-full">
+            <div
+              className="flex items-center gap-2.5 px-3.5 flex-shrink-0"
+              style={{
+                height: '36px',
+                borderBottom: '1px solid var(--line)',
+                background: 'color-mix(in oklab, var(--text) 2%, var(--bg))',
+              }}
+            >
+              <svg className="w-3.5 h-3.5 text-text-3" viewBox="0 0 16 16" fill="none">
+                <path d="M3 1.5h7l3 3V14.5H3V1.5z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+                <path d="M10 1.5v3h3" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+              </svg>
+              <span className="mono text-[12.5px] text-text-2">{id}.py</span>
+              <span className="ml-auto mono text-[11.5px] text-text-3 px-1.5 py-0.5 rounded" style={{ background: 'var(--bg-sunken)', border: '1px solid var(--line)' }}>Python</span>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <CodeEditor value={currentCode} onChange={setCurrentCode} />
+            </div>
+          </div>
+        }
         bottom={
           <div className="flex flex-col h-full">
             <TestPanel tests={problem.tests} functionName={problem.functionName} />
-            <ActionBar onSubmit={handleSubmit} onRun={handleRun} isSubmitting={isSubmitting} isRunning={isRunning} />
+            <ActionBar onSubmit={handleSubmit} onRun={handleRun} isSubmitting={isSubmitting} isRunning={isRunning} attemptCount={submissionHistory.length} />
           </div>
         }
         defaultRatio={0.65}
@@ -218,6 +243,14 @@ function WorkspacePageNew() {
           <span className="opacity-60">/</span>
           <span className="text-text font-medium">{problem ? (locale === 'zh' ? problem.titleZh : problem.title) : id}</span>
         </div>
+
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="w-8 h-8 inline-flex items-center justify-center rounded-lg text-text-2 cursor-pointer hover:text-text hover:border-line-strong transition-[color,border-color] duration-150"
+          style={{ border: '1px solid var(--line)', background: 'var(--bg-elev)' }}
+        >
+          <Menu className="w-3.5 h-3.5" />
+        </button>
 
         <div className="flex-1" />
 
@@ -273,14 +306,6 @@ function WorkspacePageNew() {
         )}
 
         <button
-          onClick={() => setDrawerOpen(true)}
-          className="w-8 h-8 inline-flex items-center justify-center rounded-lg text-text-2 cursor-pointer hover:text-text hover:border-line-strong transition-[color,border-color] duration-150"
-          style={{ border: '1px solid var(--line)', background: 'var(--bg-elev)' }}
-        >
-          <Menu className="w-3.5 h-3.5" />
-        </button>
-
-        <button
           onClick={toggleDesign}
           className="w-8 h-8 inline-flex items-center justify-center rounded-lg text-text-2 cursor-pointer hover:text-text hover:border-line-strong transition-[color,border-color] duration-150"
           style={{ border: '1px solid var(--line)', background: 'var(--bg-elev)' }}
@@ -316,6 +341,18 @@ function WorkspacePageNew() {
         progress={progress}
         currentId={id}
       />
+      {feedbackResult && (
+        <FeedbackModal
+          result={feedbackResult}
+          onClose={() => setFeedbackResult(null)}
+          attemptNumber={submissionHistory.length}
+          pathProgress={pathData ? {
+            solved: pathData.problems.filter(p => p.status === 'solved').length,
+            total: pathData.problems.length,
+            name: locale === 'zh' ? pathData.titleZh : pathData.titleEn,
+          } : null}
+        />
+      )}
     </div>
   );
 }

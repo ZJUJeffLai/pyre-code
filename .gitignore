@@ -34,7 +34,7 @@ labextension/yarn.lock
 .worktrees/
 .omc/
 CLAUDE.md
-pyre-code-claude-design/
+pyre-code-design/
 
 # Runtime data
 web/data/

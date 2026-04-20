@@ -12,6 +12,15 @@ interface Cell {
   role: string;
 }
 
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="flex items-center gap-2.5 mono text-xs tracking-[0.12em] uppercase text-text-3 font-medium mt-7 mb-3">
+      {children}
+      <span className="flex-1 h-px" style={{ background: 'var(--line)' }} />
+    </h3>
+  );
+}
+
 interface SolutionPageProps {
   problemId: string;
 }
@@ -48,38 +57,45 @@ export function SolutionPageContent({ problemId }: SolutionPageProps) {
 
           {/* Solution code */}
           {solutionCode && (
-            <div className="rounded-xl overflow-hidden mb-[18px]" style={{ border: '1px solid var(--line)', background: 'var(--bg-elev)' }}>
-              <div
-                className="flex items-center gap-2.5 px-3.5 h-[38px] mono text-xs text-text-2"
-                style={{ borderBottom: '1px solid var(--line)', background: 'color-mix(in oklab, var(--text) 2%, var(--bg-elev))' }}
-              >
-                <span className="text-text">{problemId}.py</span>
-                <span className="flex-1" />
+            <>
+              <SectionHeader>Reference Implementation</SectionHeader>
+              <div className="rounded-xl overflow-hidden mb-[18px]" style={{ border: '1px solid var(--line)', background: 'var(--bg-elev)' }}>
+                <div
+                  className="flex items-center gap-2.5 px-3.5 h-[38px] mono text-xs text-text-2"
+                  style={{ borderBottom: '1px solid var(--line)', background: 'color-mix(in oklab, var(--text) 2%, var(--bg-elev))' }}
+                >
+                  <span className="text-text">{problemId}.py</span>
+                  <span className="flex-1" />
+                </div>
+                <div className="h-[400px]">
+                  <CodeEditor value={solutionCode} onChange={() => {}} readOnly />
+                </div>
               </div>
-              <div className="h-[400px]">
-                <CodeEditor value={solutionCode} onChange={() => {}} readOnly />
-              </div>
-            </div>
+            </>
           )}
 
           {/* Explanations */}
+          {explanations.length > 0 && <SectionHeader>Walkthrough</SectionHeader>}
           {explanations.map((c, i) => (
             <p key={i} className="text-[14.5px] text-text-2 leading-[1.7] mb-3.5 max-w-[68ch]">{c.source}</p>
           ))}
 
           {/* Demo code */}
           {demoCode && (
-            <div className="rounded-xl overflow-hidden mt-7" style={{ border: '1px solid var(--line)', background: 'var(--bg-elev)' }}>
-              <div
-                className="flex items-center gap-2.5 px-3.5 h-[38px] mono text-xs text-text-2"
-                style={{ borderBottom: '1px solid var(--line)', background: 'color-mix(in oklab, var(--text) 2%, var(--bg-elev))' }}
-              >
-                <span className="text-text">demo</span>
+            <>
+              <SectionHeader>Demo</SectionHeader>
+              <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--line)', background: 'var(--bg-elev)' }}>
+                <div
+                  className="flex items-center gap-2.5 px-3.5 h-[38px] mono text-xs text-text-2"
+                  style={{ borderBottom: '1px solid var(--line)', background: 'color-mix(in oklab, var(--text) 2%, var(--bg-elev))' }}
+                >
+                  <span className="text-text">demo</span>
+                </div>
+                <div style={{ height: `${Math.max(120, demoCode.split('\n').length * 22 + 32)}px` }}>
+                  <CodeEditor value={demoCode} onChange={() => {}} readOnly />
+                </div>
               </div>
-              <div style={{ height: `${Math.max(120, demoCode.split('\n').length * 22 + 32)}px` }}>
-                <CodeEditor value={demoCode} onChange={() => {}} readOnly />
-              </div>
-            </div>
+            </>
           )}
         </div>
 

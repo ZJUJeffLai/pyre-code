@@ -206,7 +206,12 @@ function ProblemsPageNew() {
                           <div className="font-medium text-text">{locale === 'zh' ? p.titleZh : p.title}</div>
                           <div className="mono text-[11.5px] text-text-3 mt-0.5">{p.id}.py</div>
                         </td>
-                        <td className="px-2 py-3 mono text-[12px] text-text-2">{cat}</td>
+                        <td className="px-2 py-3 mono text-[12px] text-text-2">
+                          <span className="inline-flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'var(--text-3)' }} />
+                            {cat}
+                          </span>
+                        </td>
                         <td className="px-2 py-3">
                           <Badge variant={p.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard'}>
                             {p.difficulty.toUpperCase()}

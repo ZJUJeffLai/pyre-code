@@ -18,6 +18,7 @@ export function Footer() {
         <div className="flex gap-[18px]">
           <a href="https://github.com/whwangovo/pyre-code" className="hover:text-text transition-colors duration-150">GitHub</a>
           <a href="https://github.com/whwangovo/pyre-code/issues" className="hover:text-text transition-colors duration-150">Issues</a>
+          <a href="https://github.com/whwangovo/pyre-code/blob/main/CONTRIBUTING.md" className="hover:text-text transition-colors duration-150">Contribute</a>
         </div>
       </div>
     </footer>

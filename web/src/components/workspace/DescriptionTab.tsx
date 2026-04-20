@@ -65,10 +65,10 @@ export function DescriptionTab({ problem }: DescriptionTabProps) {
   const hint = locale === 'zh' && problem.hintZh ? problem.hintZh : problem.hint;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-7 py-6 space-y-6">
       <div>
         <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-xl font-semibold tracking-tight">{locale === 'zh' ? problem.titleZh : problem.title}</h1>
+          <h1 className="text-[22px] tracking-[-0.02em] font-semibold">{locale === 'zh' ? problem.titleZh : problem.title}</h1>
           <Badge variant={problem.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard'}>
             {problem.difficulty.toUpperCase()}
           </Badge>
@@ -92,9 +92,14 @@ export function DescriptionTab({ problem }: DescriptionTabProps) {
           </button>
           {hintOpen && (
             <div
-              className="mt-2 p-3 rounded-lg text-sm text-text-2 leading-relaxed space-y-1"
-              style={{ background: 'color-mix(in oklab, var(--medium) 5%, var(--bg-elev))' }}
+              className="mt-2 p-3 px-3.5 rounded-[9px] text-sm text-text-2 leading-relaxed space-y-1"
+              style={{
+                background: 'color-mix(in oklab, var(--accent) 4%, var(--bg))',
+                border: '1px solid var(--accent-line)',
+                borderLeft: '3px solid var(--accent)',
+              }}
             >
+              <span className="mono text-[10.5px] tracking-[0.12em] uppercase text-accent font-semibold block mb-1">⚑ HINT</span>
               {hint.split('\n').map((line, i) => (
                 <p key={i}>{parseInline(line)}</p>
               ))}

@@ -130,7 +130,7 @@ function PathDetailPageNew() {
 
         <div className="relative pl-8">
           {/* Timeline line */}
-          <div className="absolute left-[11px] top-0 bottom-0 w-px" style={{ background: 'var(--line)' }} />
+          <div className="absolute left-[11px] top-0 bottom-0 w-px z-0" style={{ background: 'var(--line)' }} />
 
           {path.problems.map((step, i) => {
             const stepTitle = locale === 'zh' ? step.titleZh : step.title;
@@ -151,7 +151,7 @@ function PathDetailPageNew() {
                 {/* Step number */}
                 <span
                   className={cn(
-                    'w-6 h-6 rounded-full flex items-center justify-center mono text-[11px] flex-shrink-0 -ml-[42px]',
+                    'w-6 h-6 rounded-full flex items-center justify-center mono text-[11px] flex-shrink-0 -ml-[42px] relative z-10',
                     isSolved ? 'bg-easy text-white' : isAttempted ? 'text-medium' : isCurrent ? 'text-accent font-medium' : 'text-text-3'
                   )}
                   style={
