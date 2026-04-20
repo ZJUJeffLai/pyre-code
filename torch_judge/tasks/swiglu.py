@@ -63,4 +63,18 @@ assert Wg.grad is not None, 'No gradient for Wgate'
     gate = x @ Wgate
     swish_gate = gate * torch.sigmoid(gate)
     return (h * swish_gate) @ W2''',
+    "demo": """torch.manual_seed(0)
+B, D, H = 2, 8, 16
+x = torch.randn(B, D)
+W1 = torch.randn(D, H)
+W2 = torch.randn(H, D)
+Wgate = torch.randn(D, H)
+
+out = swiglu(x, W1, W2, Wgate)
+print("Output shape:", out.shape)
+
+gate = x @ Wgate
+swish_gate = gate * torch.sigmoid(gate)
+print("Gate (swish) sample values:", swish_gate[0, :4])""",
+
 }

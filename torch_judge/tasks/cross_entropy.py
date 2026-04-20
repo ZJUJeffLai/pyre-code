@@ -29,4 +29,9 @@ TASK = {
     "solution": '''def cross_entropy_loss(logits, targets):
     log_probs = logits - torch.logsumexp(logits, dim=-1, keepdim=True)
     return -log_probs[torch.arange(targets.shape[0]), targets].mean()''',
+    "demo": """logits = torch.randn(4, 10)
+targets = torch.randint(0, 10, (4,))
+print('Loss:', cross_entropy_loss(logits, targets).item())
+print('Ref: ', torch.nn.functional.cross_entropy(logits, targets).item())""",
+
 }

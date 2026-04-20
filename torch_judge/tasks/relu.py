@@ -60,4 +60,8 @@ assert elapsed < 5.0, f'Too slow: {elapsed:.2f}s for 100 iterations'
     ],
     "solution": '''def relu(x: torch.Tensor) -> torch.Tensor:
     return x * (x > 0).float()''',
+    "demo": """x = torch.tensor([-2., -1., 0., 1., 2.])
+print("Input: ", x)
+print("Output:", relu(x))""",
+
 }

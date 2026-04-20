@@ -45,4 +45,9 @@ TASK = {
     if bias is not None:
         out = out + bias.view(1, -1, 1, 1)
     return out''',
+    "demo": """x = torch.randn(1, 3, 8, 8)
+w = torch.randn(16, 3, 3, 3)
+print('Output:', my_conv2d(x, w).shape)
+print('Match:', torch.allclose(my_conv2d(x, w), F.conv2d(x, w), atol=1e-4))""",
+
 }

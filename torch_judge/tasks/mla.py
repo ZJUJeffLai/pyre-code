@@ -130,4 +130,26 @@ assert torch.allclose(out, expected, atol=1e-5), f'MLA numerical mismatch: max d
     attn = torch.softmax(Q @ K.transpose(-2, -1) * scale, dim=-1)
     out = (attn @ V).transpose(1, 2).reshape(B, S, num_heads * D_h)
     return out''',
+    "demo": """torch.manual_seed(0)
+B, S, D = 2, 6, 32
+num_heads = 4
+D_h = 8          # head dim
+D_c = 8          # compressed KV dim (latent)
+
+W_dkv = torch.randn(D, D_c) * 0.1      # compress to latent
+W_uk  = torch.randn(D_c, num_heads * D_h) * 0.1  # up-project to K
+W_uv  = torch.randn(D_c, num_heads * D_h) * 0.1  # up-project to V
+W_q   = torch.randn(D, num_heads * D_h) * 0.1
+
+X = torch.randn(B, S, D)
+
+c_kv = X @ W_dkv
+K_full = c_kv @ W_uk
+print(f"Input shape:          {X.shape}")       # (2, 6, 32)
+print(f"Compressed KV shape:  {c_kv.shape}")    # (2, 6, 8)  <-- small latent
+print(f"Full K shape:         {K_full.shape}")  # (2, 6, 32) <-- expanded
+
+out = mla_attention(X, W_dkv, W_uk, W_uv, W_q, num_heads)
+print(f"Output shape:         {out.shape}")     # (2, 6, 32)""",
+
 }

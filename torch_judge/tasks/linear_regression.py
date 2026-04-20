@@ -144,4 +144,17 @@ assert not w.requires_grad, 'Closed-form w should not require grad'
         w = layer.weight.data.squeeze(0)  # (D,)
         b = layer.bias.data.squeeze(0)    # scalar ()
         return w, b''',
+    "demo": """torch.manual_seed(42)
+X = torch.randn(100, 3)
+true_w = torch.tensor([2.0, -1.0, 0.5])
+y = X @ true_w + 3.0
+
+model = LinearRegression()
+for name, method in [("Closed-form", model.closed_form),
+                      ("Grad Descent", lambda X, y: model.gradient_descent(X, y, lr=0.05, steps=2000)),
+                      ("nn.Linear", lambda X, y: model.nn_linear(X, y, lr=0.05, steps=2000))]:
+    w, b = method(X, y)
+    print(f"{name:13s}  w={w.tolist()}  b={b.item():.4f}")
+print(f"{'True':13s}  w={true_w.tolist()}  b=3.0000")""",
+
 }

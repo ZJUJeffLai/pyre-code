@@ -52,4 +52,18 @@ TASK = {
         base = x @ W_fp.T
         delta = x @ self.lora_A @ self.lora_B * (self.alpha / self.rank)
         return base + delta''',
+    "demo": """torch.manual_seed(0)
+in_f, out_f, rank = 64, 32, 4
+layer = QLoRALinear(in_f, out_f, rank, alpha=2.0)
+
+W_ref = torch.randn(out_f, in_f)
+layer.set_weight(W_ref)
+
+x = torch.randn(8, in_f)
+y_qlora = layer(x)
+y_ref = x @ W_ref.T  # full-precision baseline (no LoRA delta)
+
+print("Output shape:", y_qlora.shape)          # (8, 32)
+print("Max abs error vs fp32:", (y_qlora - y_ref).abs().max().item())""",
+
 }

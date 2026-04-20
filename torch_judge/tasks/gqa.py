@@ -98,4 +98,7 @@ assert gqa.W_q.weight.grad is not None and gqa.W_k.weight.grad is not None, 'Mis
         attn = torch.matmul(weights, v)
         out = attn.transpose(1, 2).contiguous().view(B, S, -1)
         return self.W_o(out)''',
+    "demo": """gqa = GroupQueryAttention(32, 8, 2)
+print('Output:', gqa.forward(torch.randn(1, 4, 32)).shape)""",
+
 }

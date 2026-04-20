@@ -75,4 +75,20 @@ def checkpoint_sequential(fns, x):
     for fn in fns:
         x = cp.checkpoint(fn, x, use_reentrant=False)
     return x""",
+    "demo": """torch.manual_seed(0)
+layers = [torch.nn.Linear(16, 16) for _ in range(4)]
+x = torch.randn(4, 16, requires_grad=True)
+
+out_cp = checkpoint_sequential(layers, x)
+
+x2 = x.detach().requires_grad_(True)
+out_naive = x2
+for layer in layers:
+    out_naive = layer(out_naive)
+
+print("Outputs match:", torch.allclose(out_cp, out_naive, atol=1e-5))
+
+out_cp.sum().backward()
+print("Gradient flows (x.grad is not None):", x.grad is not None)""",
+
 }

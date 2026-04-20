@@ -89,4 +89,22 @@ assert W_ada.grad is not None, 'No gradient for W_ada'
     # Modulate: unsqueeze for broadcast over N tokens
     out = alpha1.unsqueeze(1) * (gamma1.unsqueeze(1) * x_norm + beta1.unsqueeze(1))
     return out''',
+    "demo": """torch.manual_seed(0)
+
+B, N, D = 4, 16, 32
+C = 16  # conditioning dim
+
+x    = torch.randn(B, N, D)
+cond = torch.randn(B, C)
+
+W_ada = torch.zeros(C, 6 * D)
+b_ada = torch.zeros(6 * D)
+out_zero = adaln_zero(x, cond, W_ada, b_ada)
+print(f"Zero W_ada, zero b_ada => max abs output: {out_zero.abs().max().item():.6f}  (expected 0.0)")
+
+W_ada_rand = torch.randn(C, 6 * D) * 0.1
+b_ada_rand = torch.randn(6 * D) * 0.1
+out_rand = adaln_zero(x, cond, W_ada_rand, b_ada_rand)
+print(f"Random W_ada          => output shape: {out_rand.shape}, mean abs: {out_rand.abs().mean().item():.4f}")""",
+
 }

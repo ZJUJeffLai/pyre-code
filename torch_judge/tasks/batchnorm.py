@@ -118,4 +118,20 @@ def my_batch_norm(
 
     x_norm = (x - mean) / torch.sqrt(var + eps)
     return gamma * x_norm + beta''',
+    "demo": """x = torch.randn(8, 4)
+gamma = torch.ones(4)
+beta = torch.zeros(4)
+
+running_mean = torch.zeros(4)
+running_var = torch.ones(4)
+
+out_train = my_batch_norm(x, gamma, beta, running_mean, running_var, training=True)
+print("[Train] Column means:", out_train.mean(dim=0))
+print("[Train] Column stds: ", out_train.std(dim=0))
+print("Updated running_mean:", running_mean)
+print("Updated running_var:", running_var)
+
+out_eval = my_batch_norm(x, gamma, beta, running_mean, running_var, training=False)
+print("[Eval] Column means (using running stats):", out_eval.mean(dim=0))""",
+
 }

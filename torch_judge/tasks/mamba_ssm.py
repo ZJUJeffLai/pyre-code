@@ -52,4 +52,23 @@ assert delta.grad is not None, 'delta.grad is None'
     h_new = dA * h + dB * x.unsqueeze(-1)                  # (B, D, N)
     y = (h_new * C).sum(dim=-1)                             # (B, D)
     return y, h_new''',
+    "demo": """torch.manual_seed(0)
+B_size, D, N = 2, 8, 4  # batch, channels, state_dim
+
+x     = torch.randn(B_size, D)
+h     = torch.zeros(B_size, D, N)
+A     = -torch.rand(D, N)          # negative for stability
+B_mat = torch.randn(D, N)
+C     = torch.randn(B_size, D, N)
+delta = torch.rand(B_size, D).add(0.1)  # positive step sizes
+
+y, h_new = mamba_ssm_step(x, h, A, B_mat, C, delta)
+
+print("y shape:    ", y.shape)      # (2, 8)
+print("h_new shape:", h_new.shape)  # (2, 8, 4)
+
+dA_manual = torch.exp(delta[0, 0] * A[0])
+dA_check  = torch.exp(delta[0:1, 0:1] * A[0:1])[0, 0]
+print("dA formula check (should be ~0):", (dA_manual - dA_check).abs().max().item())""",
+
 }

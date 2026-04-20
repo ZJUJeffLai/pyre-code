@@ -37,4 +37,18 @@ TASK = {
     # manual log-sigmoid: log(1/(1+exp(-x))) = -log(1+exp(-x))
     loss = -torch.log(1.0 / (1.0 + torch.exp(-margin))).mean()
     return loss''',
+    "demo": """torch.manual_seed(0)
+
+B, D = 8, 64
+reward_head = torch.randn(D, 1)
+
+h = torch.randn(B, D)
+loss_equal = reward_model_loss(h, h, reward_head)
+print(f"Equal hidden states => loss = {loss_equal.item():.4f}  (expected ≈ {math.log(2):.4f})")
+
+chosen  = torch.ones(B, D)
+rejected = -torch.ones(B, D)
+loss_good = reward_model_loss(chosen, rejected, reward_head)
+print(f"Chosen >> rejected  => loss = {loss_good.item():.4f}  (expected small)")""",
+
 }

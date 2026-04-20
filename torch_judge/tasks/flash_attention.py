@@ -60,4 +60,11 @@ TASK = {
             row_max = new_max
         output[:, i:i+block_size] = acc / row_sum
     return output''',
+    "demo": """Q, K, V = torch.randn(1, 16, 8), torch.randn(1, 16, 8), torch.randn(1, 16, 8)
+out = flash_attention(Q, K, V, block_size=4)
+scores = torch.bmm(Q, K.transpose(1,2)) / math.sqrt(8)
+ref = torch.bmm(torch.softmax(scores, dim=-1), V)
+print('Shape:', out.shape)
+print('Max diff:', (out - ref).abs().max().item())""",
+
 }

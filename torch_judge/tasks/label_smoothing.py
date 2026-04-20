@@ -85,4 +85,17 @@ assert torch.allclose(out, expected, atol=1e-5), f'Expected {expected.item():.6f
     soft_targets = torch.full_like(log_probs, smoothing / (C - 1))
     soft_targets.scatter_(1, targets.unsqueeze(1), 1.0 - smoothing)
     return -(soft_targets * log_probs).sum(dim=-1).mean()''',
+    "demo": """torch.manual_seed(0)
+logits = torch.randn(4, 10)
+targets = torch.randint(0, 10, (4,))
+
+loss_smoothed = label_smoothing(logits, targets, smoothing=0.1)
+loss_ce = torch.nn.functional.cross_entropy(logits, targets)
+
+print(f"Label smoothing loss (eps=0.1): {loss_smoothed.item():.4f}")
+print(f"Standard CE loss (eps=0.0):    {loss_ce.item():.4f}")
+
+loss_no_smooth = label_smoothing(logits, targets, smoothing=0.0)
+print(f"Label smoothing loss (eps=0.0): {loss_no_smooth.item():.4f}  (matches CE: {torch.allclose(loss_no_smooth, loss_ce)})")""",
+
 }

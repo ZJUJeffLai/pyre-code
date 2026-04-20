@@ -46,4 +46,11 @@ TASK = {
     all_seqs = completed + beams
     all_seqs.sort(key=lambda x: x[0], reverse=True)
     return all_seqs[0][1]''',
+    "demo": """def simple_fn(tokens):
+    lp = torch.full((5,), -10.0)
+    lp[min(len(tokens), 4)] = 0.0
+    return lp
+seq = beam_search(simple_fn, start_token=0, max_len=5, beam_width=2, eos_token=4)
+print('Sequence:', seq)""",
+
 }

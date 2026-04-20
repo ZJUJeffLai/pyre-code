@@ -110,4 +110,8 @@ class GPT2Block(nn.Module):
         x = x + self._attn(self.ln1(x))
         x = x + self.mlp(self.ln2(x))
         return x''',
+    "demo": """block = GPT2Block(64, 4)
+print('Output:', block(torch.randn(2, 8, 64)).shape)
+print('Params:', sum(p.numel() for p in block.parameters()))""",
+
 }

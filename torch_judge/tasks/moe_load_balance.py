@@ -63,4 +63,21 @@ assert logits.grad.shape == logits.shape, 'Gradient shape mismatch'
     probs = torch.softmax(router_logits, dim=-1)  # (N, num_experts)
     P = probs.mean(dim=0)                          # (num_experts,)
     return num_experts * (f * P).sum()''',
+    "demo": """num_experts = 4
+N_tokens = 100
+logits_uniform = torch.zeros(N_tokens, num_experts)
+loss_uniform = moe_load_balance_loss(logits_uniform, num_experts)
+print(f"Uniform routing loss: {loss_uniform.item():.4f}  (expected 1.0)")
+
+logits_collapsed = torch.zeros(N_tokens, num_experts)
+logits_collapsed[:, 0] = 100.0
+loss_collapsed = moe_load_balance_loss(logits_collapsed, num_experts)
+print(f"Collapsed routing loss: {loss_collapsed.item():.4f}  (expected > 1.0)")
+
+torch.manual_seed(0)
+logits_grad = torch.randn(16, num_experts, requires_grad=True)
+loss_grad = moe_load_balance_loss(logits_grad, num_experts)
+loss_grad.backward()
+print(f"Gradient exists: {logits_grad.grad is not None}")""",
+
 }

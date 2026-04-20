@@ -36,4 +36,11 @@ TASK = {
             return x
         mask = (torch.rand_like(x) > self.p).float()
         return x * mask / (1 - self.p)''',
+    "demo": """d = MyDropout(p=0.5)
+d.train()
+x = torch.ones(10)
+print('Train:', d(x))
+d.eval()
+print('Eval: ', d(x))""",
+
 }

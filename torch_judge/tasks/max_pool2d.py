@@ -33,4 +33,10 @@ TASK = {
     # after two unfolds: (B, C, H_out, W_out, kernel_size, kernel_size)
     patches = x.unfold(2, kernel_size, stride).unfold(3, kernel_size, stride)
     return patches.flatten(-2).max(dim=-1).values''',
+    "demo": """x = torch.randn(1, 1, 4, 4)
+out = max_pool2d(x, kernel_size=2, stride=2)
+ref = F.max_pool2d(x, kernel_size=2, stride=2)
+print("Output shape:", out.shape)
+print("Matches F.max_pool2d:", torch.allclose(out, ref))""",
+
 }

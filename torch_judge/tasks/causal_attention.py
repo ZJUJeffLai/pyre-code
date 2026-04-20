@@ -88,4 +88,11 @@ assert torch.allclose(out, expected, atol=1e-5), f'Numerical mismatch: max diff 
     scores = scores.masked_fill(mask.unsqueeze(0), float('-inf'))
     weights = torch.softmax(scores, dim=-1)
     return torch.bmm(weights, V)''',
+    "demo": """torch.manual_seed(0)
+Q = torch.randn(1, 4, 8)
+K = torch.randn(1, 4, 8)
+V = torch.randn(1, 4, 8)
+out = causal_attention(Q, K, V)
+print("Pos 0 == V[0]?", torch.allclose(out[:, 0], V[:, 0], atol=1e-5))""",
+
 }

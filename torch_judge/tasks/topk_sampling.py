@@ -44,4 +44,8 @@ TASK = {
         logits = torch.empty_like(logits).scatter_(0, sorted_idx, sorted_logits)
     probs = torch.softmax(logits, dim=-1)
     return torch.multinomial(probs, 1).item()''',
+    "demo": """logits = torch.tensor([1.0, 5.0, 2.0, 0.5])
+print('top_k=1:', sample_top_k_top_p(logits.clone(), top_k=1))
+print('top_p=0.5:', sample_top_k_top_p(logits.clone(), top_p=0.5))""",
+
 }

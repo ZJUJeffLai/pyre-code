@@ -100,4 +100,20 @@ assert Q.grad is not None and K.grad is not None and V.grad is not None
         outputs.append(o)
 
     return torch.cat(outputs, dim=1)''',
+    "demo": """torch.manual_seed(42)
+B, S, D = 2, 8, 16
+Q = torch.randn(B, S, D)
+K = torch.randn(B, S, D)
+V = torch.randn(B, S, D)
+
+scale = D ** -0.5
+scores_ref = (Q @ K.transpose(-2, -1)) * scale
+ref_out = torch.softmax(scores_ref, dim=-1) @ V
+
+for num_devices in [2, 4]:
+    ring_out = ring_attention(Q, K, V, num_devices=num_devices)
+    max_diff = (ring_out - ref_out).abs().max().item()
+    match = torch.allclose(ring_out, ref_out, atol=1e-5)
+    print(f'num_devices={num_devices}  shape={tuple(ring_out.shape)}  max_diff={max_diff:.2e}  match={match}')""",
+
 }

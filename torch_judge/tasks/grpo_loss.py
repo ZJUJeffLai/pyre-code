@@ -102,4 +102,9 @@ TASK = {
 
     # GRPO objective: -E[A_i * logpi_i]
     return -(advantages_detached * logps).mean()''',
+    "demo": """logps = torch.tensor([0.0, -0.5, -1.0, -1.5])
+rewards = torch.tensor([1.0, 0.8, 0.2, 0.0])
+group_ids = torch.tensor([0, 0, 1, 1])
+print('Loss:', grpo_loss(logps, rewards, group_ids).item())""",
+
 }

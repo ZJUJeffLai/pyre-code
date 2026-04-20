@@ -50,4 +50,16 @@ assert loss_g2 <= loss_g0, f'gamma=2 ({loss_g2:.4f}) should be <= gamma=0 ({loss
     log_p_t = torch.log(p_t + 1e-8)
     fl = -alpha * (1 - p_t) ** gamma * log_p_t
     return fl.mean()''',
+    "demo": """torch.manual_seed(0)
+logits = torch.randn(8, 4)
+targets = torch.randint(0, 4, (8,))
+
+fl_gamma0 = focal_loss(logits, targets, alpha=0.25, gamma=0.0)
+ce = F.cross_entropy(logits, targets)
+print(f"Focal (gamma=0): {fl_gamma0:.4f}  |  alpha * CE: {0.25 * ce:.4f}")
+
+fl_g2 = focal_loss(logits, targets, alpha=0.25, gamma=2.0)
+fl_g5 = focal_loss(logits, targets, alpha=0.25, gamma=5.0)
+print(f"Focal gamma=2: {fl_g2:.4f}  |  gamma=5: {fl_g5:.4f}  (higher gamma -> lower loss)")""",
+
 }

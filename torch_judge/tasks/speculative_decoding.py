@@ -44,4 +44,9 @@ TASK = {
             accepted.append(torch.multinomial(adjusted, 1).item())
             return accepted
     return accepted''',
+    "demo": """torch.manual_seed(0)
+probs = torch.softmax(torch.randn(4, 10), dim=-1)
+tokens = torch.tensor([2, 5, 1, 8])
+print('Perfect draft:', speculative_decode(probs, probs, tokens))""",
+
 }

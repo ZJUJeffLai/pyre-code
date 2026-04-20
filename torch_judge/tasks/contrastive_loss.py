@@ -58,4 +58,20 @@ assert torch.allclose(out, expected, atol=1e-5), f'Expected {expected.item():.6f
     positive_logits = logits[torch.arange(N, device=q.device), torch.arange(N, device=q.device)]
     log_p = positive_logits - log_sum_exp
     return -log_p.mean()''',
+    "demo": """torch.manual_seed(0)
+N, D = 8, 16
+
+v = torch.randn(N, D)
+q = v / v.norm(dim=-1, keepdim=True)
+k = q.clone()
+loss_perfect = contrastive_loss(q, k)
+print(f"Perfect alignment loss: {loss_perfect:.4f}  (should be near log(1/N) = {-torch.log(torch.tensor(N, dtype=torch.float)):.4f})")
+
+q_rand = torch.randn(N, D)
+q_rand = q_rand / q_rand.norm(dim=-1, keepdim=True)
+k_rand = torch.randn(N, D)
+k_rand = k_rand / k_rand.norm(dim=-1, keepdim=True)
+loss_rand = contrastive_loss(q_rand, k_rand)
+print(f"Random embeddings loss:  {loss_rand:.4f}  (should be higher)")""",
+
 }

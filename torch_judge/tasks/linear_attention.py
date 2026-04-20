@@ -85,4 +85,7 @@ assert torch.allclose(out, expected, atol=1e-5), f'Numerical mismatch: max diff 
     num = torch.bmm(Q_prime, KV)                      # (B, S, D_v)
     den = torch.bmm(Q_prime, Z.transpose(1, 2))       # (B, S, 1)
     return num / (den + 1e-6)''',
+    "demo": """Q=torch.randn(1,8,16); K=torch.randn(1,8,16); V=torch.randn(1,8,32)
+print('Shape:', linear_attention(Q,K,V).shape)""",
+
 }

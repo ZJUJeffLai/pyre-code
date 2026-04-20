@@ -90,4 +90,21 @@ assert pw_weight.grad is not None, 'pw_weight.grad is None'
     # Pointwise: 1x1 conv = channel-wise linear combination
     out = torch.einsum('bchw,oc->bohw', dw_out, pw_weight[:, :, 0, 0])
     return out""",
+    "demo": """torch.manual_seed(0)
+B, C_in, H, W = 2, 4, 8, 8
+C_out, kH, kW = 8, 3, 3
+
+x         = torch.randn(B, C_in, H, W)
+dw_weight = torch.randn(C_in, 1, kH, kW)   # one kernel per input channel
+pw_weight = torch.randn(C_out, C_in, 1, 1)  # 1x1 conv
+
+out = depthwise_separable_conv(x, dw_weight, pw_weight)
+print("Output shape:", out.shape)  # (2, 8, 6, 6)
+
+patches = x.unfold(2, kH, 1).unfold(3, kW, 1)
+dw_ch0 = (patches[:, 0:1] * dw_weight[0:1, 0].view(1, 1, 1, 1, kH, kW)).sum(dim=(-2, -1))
+dw_ch1 = (patches[:, 1:2] * dw_weight[1:2, 0].view(1, 1, 1, 1, kH, kW)).sum(dim=(-2, -1))
+print("DW ch0 and ch1 are independent (cross-correlation ~0):",
+      (dw_ch0 * dw_ch1).mean().abs().item() < 1.0)""",
+
 }

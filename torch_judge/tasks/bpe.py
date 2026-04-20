@@ -81,4 +81,9 @@ TASK = {
                         i += 1
             all_tokens.extend(symbols)
         return all_tokens''',
+    "demo": """bpe = SimpleBPE()
+bpe.train(['low', 'low', 'low', 'lower', 'newest', 'widest'], num_merges=10)
+print('Merges:', bpe.merges)
+print('Encode:', bpe.encode('low lower newest'))""",
+
 }

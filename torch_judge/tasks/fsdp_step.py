@@ -99,4 +99,21 @@ assert torch.allclose(new_shards[0], expected, atol=1e-6)
         for i in range(world_size)
     ]
     return new_shards''',
+    "demo": """torch.manual_seed(0)
+world_size = 4
+shard_size = 8
+
+param_shards = [torch.randn(shard_size) for _ in range(world_size)]
+
+grad_fn = lambda p: 2.0 * p
+
+new_shards = fsdp_step(param_shards, grad_fn, world_size)
+fsdp_result = torch.cat(new_shards)
+
+full_param = torch.cat(param_shards)
+ref_result = full_param - 0.01 * grad_fn(full_param)
+
+print("FSDP result shape:", fsdp_result.shape)  # expect (32,)
+print("Max diff vs SGD reference:", (fsdp_result - ref_result).abs().max().item())  # expect ~0""",
+
 }

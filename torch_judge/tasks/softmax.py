@@ -61,4 +61,9 @@ assert torch.allclose(out.sum(dim=0), torch.ones(3), atol=1e-5), 'columns should
     x_max = x.max(dim=dim, keepdim=True).values
     e_x = torch.exp(x - x_max)
     return e_x / e_x.sum(dim=dim, keepdim=True)''',
+    "demo": """x = torch.tensor([1.0, 2.0, 3.0])
+print("Output:", my_softmax(x, dim=-1))
+print("Sum:   ", my_softmax(x, dim=-1).sum())
+print("Ref:   ", torch.softmax(x, dim=-1))""",
+
 }

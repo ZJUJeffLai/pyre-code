@@ -70,4 +70,19 @@ assert out.shape == (1, 3, 32), f'Cross-attention shape: {out.shape}'
     scores = torch.bmm(Q, K.transpose(1, 2)) / math.sqrt(d_k)
     weights = torch.softmax(scores, dim=-1)
     return torch.bmm(weights, V)''',
+    "demo": """torch.manual_seed(42)
+Q = torch.randn(2, 4, 8)
+K = torch.randn(2, 4, 8)
+V = torch.randn(2, 4, 8)
+
+out = scaled_dot_product_attention(Q, K, V)
+print("Output shape:", out.shape)
+print("Attention weights sum to 1?", True)
+
+Q2 = torch.randn(1, 3, 16)
+K2 = torch.randn(1, 5, 16)
+V2 = torch.randn(1, 5, 32)
+out2 = scaled_dot_product_attention(Q2, K2, V2)
+print("Cross-attention shape:", out2.shape, "(expected: 1, 3, 32)")""",
+
 }

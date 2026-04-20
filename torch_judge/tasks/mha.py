@@ -134,4 +134,16 @@ assert not torch.allclose(q[:, 0], q[:, 1], atol=1e-3), 'Heads produce identical
 
         out = attn.transpose(1, 2).contiguous().view(B, S_q, -1)
         return self.W_o(out)''',
+    "demo": """torch.manual_seed(0)
+mha = MultiHeadAttention(d_model=32, num_heads=4)
+x = torch.randn(2, 6, 32)
+out = mha.forward(x, x, x)
+print("Self-attn shape:", out.shape)
+
+Q = torch.randn(1, 3, 32)
+K = torch.randn(1, 7, 32)
+V = torch.randn(1, 7, 32)
+out2 = mha.forward(Q, K, V)
+print("Cross-attn shape:", out2.shape)""",
+
 }

@@ -36,4 +36,10 @@ TASK = {
     rejected_rewards = beta * (policy_rejected_logps - ref_rejected_logps)
     diff = chosen_rewards - rejected_rewards
     return -torch.log(torch.sigmoid(diff)).mean()''',
+    "demo": """chosen = torch.tensor([0.0, 0.0])
+rejected = torch.tensor([-5.0, -5.0])
+ref_c = torch.tensor([-1.0, -1.0])
+ref_r = torch.tensor([-1.0, -1.0])
+print('Loss:', dpo_loss(chosen, rejected, ref_c, ref_r, beta=0.1).item())""",
+
 }

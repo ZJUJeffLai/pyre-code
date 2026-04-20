@@ -53,4 +53,10 @@ assert layer.bias.grad is not None, 'bias.grad is None'
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return x @ self.weight.T + self.bias''',
+    "demo": """layer = SimpleLinear(8, 4)
+print("W shape:", layer.weight.shape)
+print("b shape:", layer.bias.shape)
+x = torch.randn(2, 8)
+print("Output shape:", layer.forward(x).shape)""",
+
 }

@@ -104,4 +104,23 @@ assert loss_small.item() < loss_large.item(), 'Larger prediction error should gi
     target_velocity = x1 - x0
     diff = model_output - target_velocity
     return (diff * diff).mean()''',
+    "demo": """torch.manual_seed(0)
+
+B, D = 16, 8
+x0 = torch.randn(B, D)
+x1 = torch.randn(B, D)
+t  = torch.rand(B)
+
+perfect_output = x1 - x0
+loss_perfect = flow_matching_loss(perfect_output, x0, x1, t)
+print(f"Perfect prediction => loss = {loss_perfect.item():.6f}  (expected 0.0)")
+
+random_output = torch.randn(B, D)
+loss_random = flow_matching_loss(random_output, x0, x1, t)
+print(f"Random prediction  => loss = {loss_random.item():.4f}   (expected > 0)")
+
+noisy_output = perfect_output + 0.1 * torch.randn(B, D)
+loss_noisy = flow_matching_loss(noisy_output, x0, x1, t)
+print(f"Noisy prediction   => loss = {loss_noisy.item():.4f}   (expected small but > 0)")""",
+
 }

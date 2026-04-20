@@ -82,4 +82,26 @@ assert torch.allclose(result, expected, atol=1e-5), f'Numerical mismatch: {resul
     # Previous sample
     x_prev = (alpha_bar_prev ** 0.5) * x0_pred + noise_direction
     return x_prev''',
+    "demo": """torch.manual_seed(42)
+
+T = 5
+alpha_bars = torch.linspace(0.99, 0.01, T + 1)  # index 0..T
+
+x_clean = torch.tensor([1.0, -1.0, 0.5])  # target signal
+noise   = torch.randn_like(x_clean)
+
+ab_T = alpha_bars[T]
+x_t  = ab_T ** 0.5 * x_clean + (1 - ab_T) ** 0.5 * noise
+
+print(f"{'Step':>4}  {'alpha_bar_t':>12}  {'x_t (first elem)':>18}")
+print("-" * 42)
+for step in range(T, 0, -1):
+    ab_t    = alpha_bars[step]
+    ab_prev = alpha_bars[step - 1]
+    noise_pred = (x_t - ab_t ** 0.5 * x_clean) / (1 - ab_t) ** 0.5
+    x_t = ddim_step(x_t, noise_pred, ab_t, ab_prev)
+    print(f"{step:>4}  {ab_prev.item():>12.4f}  {x_t[0].item():>18.4f}")
+
+print(f"\nFinal x vs clean: {x_t.tolist()}  vs  {x_clean.tolist()}")""",
+
 }

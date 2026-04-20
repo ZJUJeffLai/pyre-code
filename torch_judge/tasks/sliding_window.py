@@ -82,4 +82,7 @@ assert Q.grad is not None, 'Q.grad is None'
     scores = scores.masked_fill(mask.unsqueeze(0), float('-inf'))
     weights = torch.softmax(scores, dim=-1)
     return torch.bmm(weights, V)''',
+    "demo": """Q=torch.randn(1,6,8); K=torch.randn(1,6,8); V=torch.randn(1,6,8)
+print('window=0==V?', torch.allclose(sliding_window_attention(Q,K,V,0), V, atol=1e-5))""",
+
 }

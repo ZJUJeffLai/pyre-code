@@ -109,4 +109,17 @@ assert torch.allclose(out, expected, atol=1e-5), f'ALiBi numerical mismatch: max
     attn = torch.softmax(scores, dim=-1)
     out = (attn @ Vh).transpose(1, 2).reshape(B, S, D)
     return out''',
+    "demo": """torch.manual_seed(0)
+B, S, D, H = 2, 6, 16, 4
+Q = torch.randn(B, S, D)
+K = torch.randn(B, S, D)
+V = torch.randn(B, S, D)
+
+out = alibi_attention(Q, K, V, num_heads=H)
+print("Output shape:", out.shape)
+
+h_idx = torch.arange(1, H + 1, dtype=torch.float32)
+slopes = 1.0 / (2.0 ** (8.0 * h_idx / H))
+print("Slopes for 4 heads:", slopes)""",
+
 }

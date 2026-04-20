@@ -108,4 +108,19 @@ def noise_schedule(num_timesteps, schedule_type=\'cosine\'):
     else:
         raise ValueError(f\'Unknown schedule_type: {schedule_type}\')
     return alpha_bar''',
+    "demo": """T = 1000
+schedules = ['linear', 'cosine', 'sigmoid']
+checkpoints = [0, T // 4, T // 2, 3 * T // 4, T - 1]
+labels = ['t=0', 'T/4', 'T/2', '3T/4', 'T-1']
+
+col_w = 10
+header = f"{'t':>6}" + "".join(f"{s:>{col_w}}" for s in schedules)
+print(header)
+print("-" * len(header))
+
+results = {s: noise_schedule(T, s) for s in schedules}
+for label, idx in zip(labels, checkpoints):
+    row = f"{label:>6}" + "".join(f"{results[s][idx].item():>{col_w}.4f}" for s in schedules)
+    print(row)""",
+
 }

@@ -34,4 +34,11 @@ TASK = {
         for p in parameters:
             p.grad.mul_(clip_coef)
     return total_norm.item()''',
+    "demo": """p = torch.randn(100, requires_grad=True)
+(p * 10).sum().backward()
+print('Before:', p.grad.norm().item())
+orig = clip_grad_norm([p], max_norm=1.0)
+print('After: ', p.grad.norm().item())
+print('Returned:', orig)""",
+
 }

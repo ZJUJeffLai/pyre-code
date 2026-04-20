@@ -84,4 +84,9 @@ class MixtureOfExperts(nn.Module):
                 if mask.any():
                     output[mask] += weights[mask, k:k+1] * self.experts[e](x_flat[mask])
         return output.reshape(orig_shape)''',
+    "demo": """moe = MixtureOfExperts(32, 64, num_experts=4, top_k=2)
+x = torch.randn(2, 8, 32)
+print('Output:', moe(x).shape)
+print('Params:', sum(p.numel() for p in moe.parameters()))""",
+
 }

@@ -47,4 +47,20 @@ TASK = {
     updated_values[selected_idx] = new_value
     updated_visits[selected_idx] += 1
     return selected_idx, updated_values, updated_visits''',
+    "demo": """torch.manual_seed(42)
+num_children = 5
+values = torch.zeros(num_children)
+visits = torch.zeros(num_children, dtype=torch.long)
+parent_visits = 0
+
+print("Running 5 MCTS steps:")
+print(f"{'Step':>4}  {'Selected':>8}  {'Visit counts'}")
+for step in range(5):
+    idx, values, visits = mcts_step(values, visits, parent_visits)
+    parent_visits += 1
+    print(f"{step+1:>4}  {idx:>8}  {visits.tolist()}")
+
+print(f"\nTotal visits: {visits.sum().item()} (expected 5)")
+print(f"All nodes visited at least once: {(visits > 0).all().item()}")""",
+
 }

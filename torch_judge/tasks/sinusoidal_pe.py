@@ -56,4 +56,8 @@ assert pe.min() >= -1.0 - 1e-5 and pe.max() <= 1.0 + 1e-5, 'PE values must be in
     pe[:, 0::2] = torch.sin(angles)
     pe[:, 1::2] = torch.cos(angles)
     return pe''',
+    "demo": """pe = sinusoidal_pe(10, 16)
+print(pe.shape)
+print(pe[:3, :4])""",
+
 }

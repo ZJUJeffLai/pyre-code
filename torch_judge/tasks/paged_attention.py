@@ -114,4 +114,36 @@ assert Q.grad is not None and k_pages.grad is not None
         out = attn @ V_ctx  # (1, 1, D)
         outputs.append(out)
     return torch.cat(outputs, dim=0)''',
+    "demo": """torch.manual_seed(0)
+B, S, D = 2, 8, 16
+block_size = 4
+num_blocks = S // block_size
+
+K_full = torch.randn(B, S, D)
+V_full = torch.randn(B, S, D)
+Q = torch.randn(B, 1, D)
+
+scale = D ** -0.5
+scores_ref = (Q @ K_full.transpose(-2, -1)) * scale
+ref_out = torch.softmax(scores_ref, dim=-1) @ V_full
+
+total_pages = B * num_blocks
+k_pages = torch.zeros(total_pages, block_size, D)
+v_pages = torch.zeros(total_pages, block_size, D)
+block_table = []
+for b in range(B):
+    page_ids = []
+    for blk in range(num_blocks):
+        pid = b * num_blocks + blk
+        k_pages[pid] = K_full[b, blk*block_size:(blk+1)*block_size]
+        v_pages[pid] = V_full[b, blk*block_size:(blk+1)*block_size]
+        page_ids.append(pid)
+    block_table.append(page_ids)
+
+paged_out = paged_attention(Q, k_pages, v_pages, block_table, context_len=S, block_size=block_size)
+
+print('Shape:', paged_out.shape)
+print('Max diff vs reference:', (paged_out - ref_out).abs().max().item())
+print('Match:', torch.allclose(paged_out, ref_out, atol=1e-5))""",
+
 }

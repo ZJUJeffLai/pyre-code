@@ -48,4 +48,14 @@ TASK = {
         for p in self.params:
             if p.grad is not None:
                 p.grad.zero_()''',
+    "demo": """torch.manual_seed(0)
+w = torch.randn(4, 3, requires_grad=True)
+opt = MyAdam([w], lr=0.01)
+for i in range(5):
+    loss = (w ** 2).sum()
+    loss.backward()
+    opt.step()
+    opt.zero_grad()
+    print(f'Step {i}: loss={loss.item():.4f}')""",
+
 }

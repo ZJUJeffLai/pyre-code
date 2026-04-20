@@ -64,4 +64,9 @@ assert torch.allclose(out[0], expected, atol=1e-5), f'Patch projection mismatch'
         x = x.reshape(B, C, n_h, p, n_w, p)
         x = x.permute(0, 2, 4, 1, 3, 5).reshape(B, n_h * n_w, C * p * p)
         return self.proj(x)''',
+    "demo": """pe = PatchEmbedding(224, 16, 3, 768)
+x = torch.randn(1, 3, 224, 224)
+print('Output:', pe(x).shape)
+print('Patches:', pe.num_patches)""",
+
 }

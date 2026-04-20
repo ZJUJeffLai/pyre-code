@@ -74,4 +74,9 @@ assert torch.allclose(out, expected, atol=1e-5), f'Numerical mismatch: max diff 
         weights = torch.softmax(scores, dim=-1)
         attn = torch.matmul(weights, v)
         return self.W_o(attn.transpose(1, 2).contiguous().view(B, S_q, -1))''',
+    "demo": """attn = MultiHeadCrossAttention(64, 4)
+x_q = torch.randn(2, 6, 64)
+x_kv = torch.randn(2, 10, 64)
+print('Output:', attn(x_q, x_kv).shape)""",
+
 }

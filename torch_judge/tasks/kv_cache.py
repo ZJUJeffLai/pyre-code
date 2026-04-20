@@ -122,4 +122,18 @@ assert n_grad == n_total, f'Only {n_grad}/{n_total} params got gradients'
         attn = torch.matmul(weights, v)
         out = self.W_o(attn.transpose(1, 2).contiguous().view(B, S_new, -1))
         return out, new_cache''',
+    "demo": """torch.manual_seed(0)
+attn = KVCacheAttention(d_model=64, num_heads=4)
+x = torch.randn(1, 6, 64)
+
+full_out, _ = attn(x)
+out1, cache = attn(x[:, :4])
+out2, cache = attn(x[:, 4:5], cache=cache)
+out3, cache = attn(x[:, 5:6], cache=cache)
+inc_out = torch.cat([out1, out2, out3], dim=1)
+
+print('Full shape:', full_out.shape)
+print('Match:', torch.allclose(full_out, inc_out, atol=1e-5))
+print('Final cache K shape:', cache[0].shape)""",
+
 }

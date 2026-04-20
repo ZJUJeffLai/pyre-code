@@ -85,4 +85,22 @@ assert lam.grad is not None, 'Missing gradient for lambda_val'
     A1 = torch.softmax(Q1 @ K1.transpose(-2, -1) * scale, dim=-1)
     A2 = torch.softmax(Q2 @ K2.transpose(-2, -1) * scale, dim=-1)
     return (A1 - lambda_val * A2) @ V''',
+    "demo": """torch.manual_seed(0)
+B, S, D2, D_v = 2, 4, 8, 6
+Q = torch.randn(B, S, D2)
+K = torch.randn(B, S, D2)
+V = torch.randn(B, S, D_v)
+
+D_h = D2 // 2
+scale = D_h ** -0.5
+standard = torch.softmax(Q[..., :D_h] @ K[..., :D_h].transpose(-2, -1) * scale, dim=-1) @ V
+diff_zero = diff_attention(Q, K, V, lambda_val=0.0)
+print("lambda=0 matches standard attention:", torch.allclose(diff_zero, standard, atol=1e-6))
+
+Q_same = torch.cat([Q[..., :D_h], Q[..., :D_h]], dim=-1)
+K_same = torch.cat([K[..., :D_h], K[..., :D_h]], dim=-1)
+diff_one = diff_attention(Q_same, K_same, V, lambda_val=1.0)
+print("lambda=1 with identical halves gives zero:", torch.allclose(diff_one, torch.zeros_like(diff_one), atol=1e-6))
+print("Output shape:", diff_zero.shape)  # (2, 4, 6)""",
+
 }

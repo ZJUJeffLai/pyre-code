@@ -45,4 +45,10 @@ TASK = {
         if self.bias is not None:
             out = out + self.bias
         return out''',
+    "demo": """w = torch.randn(8, 4)
+q = Int8Linear(w)
+print('Output:', q(torch.randn(2, 4)).shape)
+print('Weight dtype:', q.weight_int8.dtype)
+print('Compression: float32 -> int8 = 4x')""",
+
 }

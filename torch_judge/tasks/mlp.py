@@ -82,4 +82,9 @@ assert n_grad == n_total, f'Only {n_grad}/{n_total} params got gradients'
         gate = self.gate_proj(x)
         silu_gate = gate * torch.sigmoid(gate)
         return self.down_proj(silu_gate * self.up_proj(x))''',
+    "demo": """mlp = SwiGLUMLP(d_model=64, d_ff=128)
+x = torch.randn(2, 8, 64)
+print('Output:', mlp(x).shape)
+print('Params:', sum(p.numel() for p in mlp.parameters()))""",
+
 }

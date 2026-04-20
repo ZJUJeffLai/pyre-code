@@ -32,4 +32,10 @@ TASK = {
         total_loss += loss.item()
     optimizer.step()
     return total_loss''',
+    "demo": """model = nn.Linear(4, 2)
+opt = torch.optim.SGD(model.parameters(), lr=0.01)
+loss = accumulated_step(model, opt, nn.MSELoss(),
+    [(torch.randn(2, 4), torch.randn(2, 2)) for _ in range(4)])
+print('Accumulated loss:', loss)""",
+
 }

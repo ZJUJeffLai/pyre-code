@@ -37,4 +37,7 @@ TASK = {
         return min_lr
     progress = (step - warmup_steps) / (total_steps - warmup_steps)
     return min_lr + 0.5 * (max_lr - min_lr) * (1.0 + math.cos(math.pi * progress))''',
+    "demo": """lrs = [cosine_lr_schedule(i, 100, 10, 0.001) for i in range(101)]
+print(f'Start: {lrs[0]:.6f}, Warmup end: {lrs[10]:.6f}, Mid: {lrs[55]:.6f}, End: {lrs[100]:.6f}')""",
+
 }

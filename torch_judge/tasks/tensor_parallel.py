@@ -92,4 +92,18 @@ for p in model.parameters():
             partial = h @ w2                        # (B, d_model)
             output = partial if output is None else output + partial
         return output''',
+    "demo": """torch.manual_seed(42)
+d_model, d_ff, world_size = 64, 256, 4
+x = torch.randn(2, d_model)
+
+tp_mlp = TensorParallelMLP(d_model, d_ff, world_size)
+out = tp_mlp(x)
+print("Output shape:", out.shape)  # expect (2, 64)
+
+w1_full = torch.cat([p.data for p in tp_mlp.w1_shards], dim=1)  # (d_model, d_ff)
+w2_full = torch.cat([p.data for p in tp_mlp.w2_shards], dim=0)  # (d_ff, d_model)
+ref = torch.nn.functional.gelu(x @ w1_full) @ w2_full
+
+print("Max diff vs reference:", (out - ref).abs().max().item())  # expect ~0""",
+
 }

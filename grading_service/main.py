@@ -227,54 +227,17 @@ def run(request: RunRequest) -> GradeResponse:
     return _execute_tests(request.code, task, request.testIndices)
 
 
-def _classify_cell(src: str, fn_name: str | None) -> str:
-    """Classify a notebook code cell as 'solution' or 'demo' by actually executing it."""
-    import torch, math
-    if not fn_name:
-        return "demo"
-    ns: dict[str, Any] = {
-        "torch": torch, "Tensor": torch.Tensor,
-        "nn": torch.nn, "F": torch.nn.functional,
-        "np": __import__("numpy"), "math": math,
-    }
-    try:
-        exec(src, ns)
-    except Exception:
-        pass
-    return "solution" if fn_name in ns and callable(ns[fn_name]) else "demo"
-
 
 @app.get("/tasks/{task_id}/notebook")
 def get_notebook(task_id: str) -> dict:
-    import json as _json
     task = get_task(task_id)
-    fn_name = task.get("function_name") if task else None
-    solutions_dir = Path(__file__).parent.parent / "solutions"
-    matches = list(solutions_dir.glob(f"*_{task_id}_solution.ipynb"))
-    if not matches:
+    if task is None or not task.get("solution"):
         raise HTTPException(status_code=404, detail=f"Notebook for '{task_id}' not found")
-    nb = _json.loads(matches[0].read_text())
-    _skip = ("google.colab", "torch_judge", "get_ipython", "colab.research.google.com")
-    def _strip_imports(src: str) -> str:
-        lines = [l for l in src.splitlines() if not l.startswith("import ") and not l.startswith("from ")]
-        return "\n".join(lines).strip()
-
-    def _strip_comment_lines(src: str) -> str:
-        lines = [l for l in src.splitlines() if not l.strip().startswith("#")]
-        return "\n".join(lines).strip()
-    cells = []
-    for c in nb.get("cells", []):
-        src = "".join(c["source"])
-        if not src.strip() or any(s in src for s in _skip):
-            continue
-        if c["cell_type"] == "code":
-            src = _strip_imports(_strip_comment_lines(src))
-            if not src.strip():
-                continue
-            role = _classify_cell(src, fn_name)
-        else:
-            role = "explanation"
-        cells.append({"type": c["cell_type"], "source": src, "role": role})
+    cells = [{"type": "code", "source": task["solution"].strip(), "role": "solution"}]
+    if "explanation" in task:
+        cells.append({"type": "markdown", "source": task["explanation"].strip(), "role": "explanation"})
+    if "demo" in task:
+        cells.append({"type": "code", "source": task["demo"].strip(), "role": "demo"})
     return {"cells": cells}
 
 

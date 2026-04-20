@@ -72,4 +72,9 @@ TASK = {
 
     # PPO objective: negative mean of the more conservative objective
     return -torch.min(unclipped, clipped).mean()''',
+    "demo": """new_logps = torch.tensor([0.0, -0.2, -0.4, -0.6])
+old_logps = torch.tensor([0.0, -0.1, -0.5, -0.5])
+advantages = torch.tensor([1.0, -1.0, 0.5, -0.5])
+print('Loss:', ppo_loss(new_logps, old_logps, advantages, clip_ratio=0.2))""",
+
 }

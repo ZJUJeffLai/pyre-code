@@ -33,4 +33,9 @@ TASK = {
 
     def forward(self, indices):
         return self.weight[indices]''',
+    "demo": """emb = MyEmbedding(10, 4)
+idx = torch.tensor([0, 3, 7])
+print('Output shape:', emb(idx).shape)
+print('Matches manual:', torch.equal(emb(idx)[0], emb.weight[0]))""",
+
 }

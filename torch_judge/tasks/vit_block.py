@@ -132,4 +132,16 @@ class ViTBlock(nn.Module):
         x = x + self._mha(self.norm1(x))
         x = x + self.fc2(self._gelu(self.fc1(self.norm2(x))))
         return x""",
+    "demo": """torch.manual_seed(0)
+batch, num_patches, d_model, num_heads = 2, 16, 64, 4
+
+block = ViTBlock(d_model, num_heads)
+x = torch.randn(batch, num_patches, d_model)
+out = block(x)
+
+print("Input shape: ", x.shape)    # (2, 16, 64)
+print("Output shape:", out.shape)  # (2, 16, 64)
+assert out.shape == x.shape, "Shape mismatch!"
+print("Shape preserved: True")""",
+
 }

@@ -125,4 +125,20 @@ for p1, p2 in zip(model1.parameters(), model2.parameters()):
     optimizer.step()
 
     return loss_val''',
+    "demo": """torch.manual_seed(42)
+model = nn.Linear(8, 4)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+loss_fn = nn.MSELoss()
+
+x = torch.randn(4, 8)
+y = torch.randn(4, 4)
+
+weights_before = model.weight.data.clone()
+
+loss_val = mixed_precision_step(model, optimizer, loss_fn, x, y)
+
+print("Loss:", loss_val)
+print("Weights updated:", not torch.allclose(model.weight.data, weights_before))
+print("Model dtype after step:", model.weight.dtype)""",
+
 }

@@ -68,4 +68,10 @@ assert torch.allclose(k_rot, expected_k, atol=1e-5), f'K rotation mismatch: max 
                             x1 * sin_a + x2 * cos_a], dim=-1).flatten(-2)
 
     return rotate(q), rotate(k)''',
+    "demo": """q = torch.randn(1, 8, 16)
+k = torch.randn(1, 8, 16)
+qr, kr = apply_rope(q, k)
+print('Shape preserved:', qr.shape == q.shape)
+print('Norm preserved:', torch.allclose(q.norm(dim=-1), qr.norm(dim=-1), atol=1e-4))""",
+
 }

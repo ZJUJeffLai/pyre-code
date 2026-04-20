@@ -106,4 +106,22 @@ assert torch.allclose(q_rot, rotate(q), atol=1e-5), 'NTK base formula mismatch'
                             x1 * sin_a + x2 * cos_a], dim=-1).flatten(-2)
 
     return rotate(q), rotate(k)''',
+    "demo": """B, S, D = 1, 8, 16
+q = torch.randn(B, S, D)
+k = torch.randn(B, S, D)
+
+q1, k1 = ntk_rope(q, k, scale=1.0)
+q4, k4 = ntk_rope(q, k, scale=4.0)
+
+print("scale=1 base:", 10000.0 * (1.0 ** (D / (D - 2))))
+print("scale=4 base:", 10000.0 * (4.0 ** (D / (D - 2))))
+print()
+print("Norm preservation (scale=1):")
+print("  q input norm:", q.norm(dim=-1).mean().item())
+print("  q output norm:", q1.norm(dim=-1).mean().item())
+print()
+print("Norm preservation (scale=4):")
+print("  q input norm:", q.norm(dim=-1).mean().item())
+print("  q output norm:", q4.norm(dim=-1).mean().item())""",
+
 }

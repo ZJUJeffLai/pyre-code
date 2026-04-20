@@ -53,4 +53,11 @@ assert gamma.grad is not None, 'gamma.grad is None'
     var = x.var(dim=-1, keepdim=True, unbiased=False)
     x_norm = (x - mean) / torch.sqrt(var + eps)
     return gamma * x_norm + beta''',
+    "demo": """x = torch.randn(2, 8)
+gamma = torch.ones(8)
+beta = torch.zeros(8)
+out = my_layer_norm(x, gamma, beta)
+ref = torch.nn.functional.layer_norm(x, [8], gamma, beta)
+print("Match ref?", torch.allclose(out, ref, atol=1e-4))""",
+
 }

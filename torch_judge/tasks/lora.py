@@ -42,4 +42,11 @@ TASK = {
 
     def forward(self, x):
         return self.linear(x) + (x @ self.lora_A.T @ self.lora_B.T) * self.scaling''',
+    "demo": """layer = LoRALinear(16, 8, rank=4)
+x = torch.randn(2, 16)
+print('Output:', layer(x).shape)
+trainable = sum(p.numel() for p in layer.parameters() if p.requires_grad)
+total = sum(p.numel() for p in layer.parameters())
+print(f'Trainable: {trainable}/{total} ({100*trainable/total:.1f}%)')""",
+
 }

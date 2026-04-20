@@ -100,4 +100,25 @@ for i, h in enumerate(heads):
         log_p = log_probs.gather(-1, tgt.unsqueeze(-1)).squeeze(-1)
         total_loss = total_loss + (-log_p.mean())
     return total_loss / N''',
+    "demo": """torch.manual_seed(0)
+B, S, D, V = 2, 5, 16, 10
+
+hidden = torch.randn(B, S, D)
+head_single = torch.randn(D, V)
+targets_single = torch.randint(0, V, (B, S, 1))
+
+mtp_loss = multi_token_prediction_loss(hidden, [head_single], targets_single)
+
+logits = hidden @ head_single
+ce_loss = torch.nn.functional.cross_entropy(logits.reshape(-1, V), targets_single[:, :, 0].reshape(-1))
+
+print(f"MTP loss (N=1):  {mtp_loss.item():.6f}")
+print(f"Standard CE:     {ce_loss.item():.6f}")
+print(f"N=1 matches CE:  {torch.allclose(mtp_loss, ce_loss, atol=1e-5)}")
+
+heads_3 = [torch.randn(D, V) for _ in range(3)]
+targets_3 = torch.randint(0, V, (B, S, 3))
+loss_3 = multi_token_prediction_loss(hidden, heads_3, targets_3)
+print(f"MTP loss (N=3):  {loss_3.item():.6f}")""",
+
 }
