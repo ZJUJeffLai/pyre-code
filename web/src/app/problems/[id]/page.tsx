@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import * as Tabs from '@radix-ui/react-tabs';
-import { Menu, ChevronLeft, ChevronRight, Sun, Moon, SwatchBook } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, Sun, Moon } from 'lucide-react';
 import { SplitPane, VerticalSplitPane } from '@/components/ui/SplitPane';
 import { ProblemDrawer } from '@/components/layout/ProblemDrawer';
 import { FeedbackModal } from '@/components/workspace/FeedbackModal';
@@ -17,8 +17,6 @@ import { ActionBar } from '@/components/workspace/ActionBar';
 import { useProblemStore } from '@/store/problemStore';
 import { useLocale } from '@/context/LocaleContext';
 import { useTheme } from '@/context/ThemeContext';
-import { useDesign } from '@/context/DesignContext';
-import { WorkspacePageClassic } from '@/components/workspace/WorkspacePage.classic';
 import type { Problem, ProgressMap, SubmissionResult, LearningPath, LearningPathProblemSummary, SubmissionHistory } from '@/lib/types';
 import { loadCodeDraft, saveCodeDraft } from '@/lib/codeDraft';
 
@@ -36,8 +34,6 @@ function FlameGlyph() {
 }
 
 export default function WorkspacePage() {
-  const { design } = useDesign();
-  if (design === 'classic') return <WorkspacePageClassic />;
   return <WorkspacePageNew />;
 }
 
@@ -48,7 +44,6 @@ function WorkspacePageNew() {
   const pathId = searchParams.get('path');
   const { locale, setLocale, t } = useLocale();
   const { theme, toggleTheme } = useTheme();
-  const { toggleDesign } = useDesign();
   const {
     currentCode, setCurrentCode,
     submissionResult, setSubmissionResult,
@@ -97,6 +92,45 @@ function WorkspacePageNew() {
       setPathData(null);
     }
   }, [id, pathId, setCurrentCode, setSubmissionResult, resetTestPanel, resetAiHelp, setSubmissionHistory]);
+
+  // Keyboard shortcuts: [ / ] for prev/next problem, Esc to close drawer.
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLElement &&
+        (e.target.tagName === 'INPUT' ||
+          e.target.tagName === 'TEXTAREA' ||
+          e.target.isContentEditable ||
+          e.target.closest('.monaco-editor'))
+      )
+        return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (e.key === 'Escape' && drawerOpen) {
+        setDrawerOpen(false);
+        e.preventDefault();
+        return;
+      }
+
+      const pathProblems = pathData?.problems ?? [];
+      const currentIdx = pathProblems.findIndex((p) => p.id === id);
+      const prev = currentIdx > 0 ? pathProblems[currentIdx - 1] : null;
+      const next =
+        currentIdx >= 0 && currentIdx < pathProblems.length - 1
+          ? pathProblems[currentIdx + 1]
+          : null;
+
+      if (e.key === '[' && prev) {
+        router.push(`/problems/${prev.id}?path=${pathId}`);
+        e.preventDefault();
+      } else if (e.key === ']' && next) {
+        router.push(`/problems/${next.id}?path=${pathId}`);
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [pathData, id, pathId, router, drawerOpen, setDrawerOpen]);
 
   useEffect(() => {
     if (!codeReadyRef.current) return;
@@ -149,6 +183,22 @@ function WorkspacePageNew() {
       setIsSubmitting(false);
     }
   };
+
+  // Keyboard shortcuts: Cmd/Ctrl+Enter runs, Cmd/Ctrl+Shift+Enter submits.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!((e.metaKey || e.ctrlKey) && e.key === 'Enter')) return;
+      if (isRunning || isSubmitting) return;
+      e.preventDefault();
+      if (e.shiftKey) {
+        handleSubmit();
+      } else {
+        handleRun();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleRun, handleSubmit, isRunning, isSubmitting]);
 
   if (!problem) {
     return (
@@ -218,7 +268,7 @@ function WorkspacePageNew() {
               <span className="ml-auto mono text-[11.5px] text-text-3 px-1.5 py-0.5 rounded" style={{ background: 'var(--bg-sunken)', border: '1px solid var(--line)' }}>Python</span>
             </div>
             <div className="flex-1 overflow-hidden">
-              <CodeEditor value={currentCode} onChange={setCurrentCode} />
+              <CodeEditor value={currentCode} onChange={setCurrentCode} onRunShortcut={handleRun} onSubmitShortcut={handleSubmit} />
             </div>
           </div>
         }
@@ -314,15 +364,6 @@ function WorkspacePageNew() {
             </button>
           </div>
         )}
-
-        <button
-          onClick={toggleDesign}
-          className="w-8 h-8 inline-flex items-center justify-center rounded-lg text-text-2 cursor-pointer hover:text-text hover:border-line-strong transition-[color,border-color] duration-150"
-          style={{ border: '1px solid var(--line)', background: 'var(--bg-elev)' }}
-          title="Switch design"
-        >
-          <SwatchBook className="w-3.5 h-3.5" />
-        </button>
 
         <button
           onClick={toggleTheme}

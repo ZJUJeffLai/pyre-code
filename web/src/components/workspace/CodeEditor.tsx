@@ -1,9 +1,15 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import Editor, { type OnMount } from '@monaco-editor/react';
+import dynamic from 'next/dynamic';
+import type { OnMount } from '@monaco-editor/react';
 import { appleLight, appleDark } from '@/lib/monacoTheme';
 import { useTheme } from '@/context/ThemeContext';
+
+const Editor = dynamic(() => import('@monaco-editor/react').then((m) => m.default), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-bg-sunken animate-pulse" />,
+});
 
 interface CodeEditorProps {
   value: string;
@@ -11,6 +17,8 @@ interface CodeEditorProps {
   readOnly?: boolean;
   height?: string;
   allowParentScrollOnWheel?: boolean;
+  onRunShortcut?: () => void;
+  onSubmitShortcut?: () => void;
 }
 
 export function CodeEditor({
@@ -19,10 +27,19 @@ export function CodeEditor({
   readOnly = false,
   height = '100%',
   allowParentScrollOnWheel = false,
+  onRunShortcut,
+  onSubmitShortcut,
 }: CodeEditorProps) {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
+  const runRef = useRef(onRunShortcut);
+  const submitRef = useRef(onSubmitShortcut);
   const { theme } = useTheme();
+
+  useEffect(() => {
+    runRef.current = onRunShortcut;
+    submitRef.current = onSubmitShortcut;
+  });
 
   const handleMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -30,6 +47,8 @@ export function CodeEditor({
     monaco.editor.defineTheme('apple-light', appleLight);
     monaco.editor.defineTheme('apple-dark', appleDark);
     monaco.editor.setTheme(theme === 'dark' ? 'apple-dark' : 'apple-light');
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runRef.current?.());
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => submitRef.current?.());
   };
 
   useEffect(() => {
